@@ -39,11 +39,11 @@ Route::middleware('auth')->group(function () {
         return redirect()->route('profile.show', ['username' => Auth::user()->username]);
     })->name('profile.me');
 
-    // --- SOZLAMALAR ---
+
     Route::patch('/profile/settings', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile/settings', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // --- QO'SHIMCHA ---
+
     Route::get('/followers', function () { return view('followers'); })->name('followers');
     Route::get('/chat', function () { return view('chat'); })->name('chat');
     Route::get('/notifications', function () { return view('notifications'); })->name('notifications');
