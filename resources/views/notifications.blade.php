@@ -1,4 +1,4 @@
-<x-layouts.app>
+<x-app-layout>
     <div class="grid grid-cols-12 gap-6">
 
         <div class="col-span-12 lg:col-span-8 border-x border-gray-100 min-h-screen">
@@ -141,4 +141,4 @@
         </div>
 
     </div>
-</x-layouts.app>
+</x-app-layout>

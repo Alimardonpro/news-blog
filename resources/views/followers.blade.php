@@ -1,4 +1,4 @@
-<x-layouts.app>
+<x-app-layout>
     <div class="flex items-center gap-6 px-4 py-2 border-b border-gray-100 sticky top-0 bg-white/90 backdrop-blur z-30">
         <a href="/profile" class="p-2 -ml-2 rounded-full hover:bg-gray-100 transition">
             <svg class="w-5 h-5 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
@@ -60,4 +60,4 @@
     </div>
 
     <div class="h-20 lg:hidden"></div>
-</x-layouts.app>
+</x-app-layout>

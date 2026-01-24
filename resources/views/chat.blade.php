@@ -1,4 +1,4 @@
-<x-layouts.app>
+<x-app-layout>
     <div class="grid grid-cols-12 gap-0 lg:border lg:border-gray-200 lg:rounded-2xl lg:overflow-hidden h-[calc(100vh-80px)] lg:h-[calc(100vh-100px)] bg-white">
 
         <div class="col-span-12 lg:col-span-4 flex flex-col border-r border-gray-100 h-full">
@@ -161,4 +161,4 @@
         </div>
 
     </div>
-</x-layouts.app>
+</x-app-layout>
