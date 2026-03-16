@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('username')->unique(); // Yangi: Login uchun (@username)
             $table->string('email')->unique();
             $table->string('avatar')->nullable(); // Yangi: Profil rasmi
+            $table->string('banner')->nullable();
             $table->text('bio')->nullable();      // Yangi: O'zi haqida
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');

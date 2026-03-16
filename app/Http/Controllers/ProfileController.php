@@ -7,6 +7,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage; // <--- MUHIM: Faylni o'chirish uchun kerak
 use Illuminate\View\View;
 use App\Models\User;
 
@@ -29,8 +30,6 @@ class ProfileController extends Controller
 
     /**
      * Display the user's profile form.
-     * (Bu funksiya endi ishlatilmaydi, chunki view o'chirilgan, 
-     * lekin kodda tursa xalaqit bermaydi)
      */
     public function edit(Request $request): View
     {
@@ -44,19 +43,40 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
+        // Validatsiya qilingan ma'lumotlarni to'ldirish
         $request->user()->fill($request->validated());
 
+        // Agar email o'zgargan bo'lsa, verifikatsiyani bekor qilish
         if ($request->user()->isDirty('email')) {
             $request->user()->email_verified_at = null;
         }
 
+        // --- 1. AVATAR YUKLASH MANTIQI ---
+        if ($request->hasFile('avatar')) {
+            // Agar eski avatar bo'lsa, uni o'chirib tashlaymiz
+            if ($request->user()->avatar) {
+                Storage::disk('public')->delete($request->user()->avatar);
+            }
+            // Yangi avatarni saqlaymiz
+            $path = $request->file('avatar')->store('avatars', 'public');
+            $request->user()->avatar = $path;
+        }
+
+        // --- 2. BANNER YUKLASH MANTIQI (YANGI) ---
+        if ($request->hasFile('banner')) {
+            // Agar eski banner bo'lsa, uni o'chirib tashlaymiz
+            if ($request->user()->banner) {
+                Storage::disk('public')->delete($request->user()->banner);
+            }
+            // Yangi bannerni saqlaymiz
+            $path = $request->file('banner')->store('banners', 'public');
+            $request->user()->banner = $path;
+        }
+
+        // O'zgarishlarni saqlash
         $request->user()->save();
 
-        // --- MUHIM TUZATISH ---
-        // Oldin shunchaki route('profile.show') edi.
-        // Endi ichiga ['username' => ...] qo'shdik.
-        // Chunki route /@{username} ni kutayapti.
-        
+        // Profil sahifasiga qaytarish (username bilan)
         return Redirect::route('profile.show', ['username' => $request->user()->username])
             ->with('status', 'profile-updated');
     }

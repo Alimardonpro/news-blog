@@ -11,6 +11,11 @@ class Post extends Model
 
     protected $fillable = ['user_id', 'body', 'image'];
 
+    public function views()
+    {
+        return $this->hasMany(PostView::class);
+    }
+
     public function comments()
     {
         return $this->hasMany(Comment::class)->latest(); // Eng yangi izohlar tepada

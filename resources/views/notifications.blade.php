@@ -1,144 +1,145 @@
 <x-app-layout>
-    <div class="grid grid-cols-12 gap-6">
+    <div x-data="{ tab: 'all' }" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 bg-[#f9fafb] min-h-screen">
+        <div class="grid grid-cols-12 gap-8">
 
-        <div class="col-span-12 lg:col-span-8 border-x border-gray-100 min-h-screen">
-            
-            <div class="sticky top-0 bg-white/90 backdrop-blur z-30 border-b border-gray-100">
-                <div class="flex justify-between items-center px-4 py-3">
-                    <h2 class="text-xl font-bold text-gray-900">Notifications</h2>
-                    <button class="p-2 hover:bg-gray-100 rounded-full transition text-gray-500">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            <div class="col-span-12 lg:col-span-8 space-y-8">
+                
+                <div class="bg-white/60 backdrop-blur-xl border border-white shadow-[0_20px_50px_rgba(0,0,0,0.04)] rounded-[2.5rem] p-2.5 sticky top-8 z-50 flex items-center justify-between">
+                    <div class="flex items-center gap-1.5">
+                        <button @click="tab = 'all'" 
+                            :class="tab === 'all' ? 'bg-slate-900 text-white shadow-xl shadow-slate-200' : 'text-slate-500 hover:bg-white'"
+                            class="px-8 py-3.5 rounded-full font-black text-[13px] uppercase tracking-wider transition-all duration-500">
+                            Hammasi
+                        </button>
+                        <button @click="tab = 'verified'" 
+                            :class="tab === 'verified' ? 'bg-blue-600 text-white shadow-xl shadow-blue-200' : 'text-slate-500 hover:bg-white'"
+                            class="px-8 py-3.5 rounded-full font-black text-[13px] uppercase tracking-wider transition-all duration-500">
+                            Tasdiqlanganlar
+                        </button>
+                        <button @click="tab = 'mentions'" 
+                            :class="tab === 'mentions' ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-200' : 'text-slate-500 hover:bg-white'"
+                            class="px-8 py-3.5 rounded-full font-black text-[13px] uppercase tracking-wider transition-all duration-500">
+                            Eslatmalar
+                        </button>
+                    </div>
+                    <div class="hidden sm:flex pr-4 items-center gap-3">
+                        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Filtrlar</span>
+                        <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center border border-slate-100 cursor-pointer hover:rotate-90 transition-transform duration-500">
+                            <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m12 0a2 2 0 100-4m0 4a2 2 0 110-4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m-6 0H4m5.08 0H20m-5.08 0H4"></path></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+
+                    <div x-show="tab === 'all' || tab === 'verified'" 
+                         x-transition:enter="transition ease-out duration-500"
+                         x-transition:enter-start="opacity-0 translate-y-8"
+                         x-transition:enter-end="opacity-100 translate-y-0"
+                         class="group bg-white border border-slate-100 p-8 rounded-[3rem] shadow-[0_10px_40px_rgba(0,0,0,0.02)] hover:shadow-[0_30px_60px_rgba(0,0,0,0.06)] hover:-translate-y-1.5 transition-all duration-500">
+                        <div class="flex items-start gap-6">
+                            <div class="relative">
+                                <img src="https://ui-avatars.com/api/?name=Pavel+Durov&background=0088cc&color=fff" class="w-20 h-20 rounded-[2rem] shadow-2xl ring-4 ring-blue-50">
+                                <div class="absolute -bottom-2 -right-2 bg-blue-500 text-white p-1.5 rounded-full border-[4px] border-white">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"></path></svg>
+                                </div>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex justify-between items-center mb-3">
+                                    <h4 class="text-xl font-black text-slate-900">Pavel Durov <span class="text-blue-500 font-bold text-sm ml-2">@durov</span></h4>
+                                    <span class="text-[10px] font-black uppercase bg-blue-50 text-blue-600 px-3 py-1.5 rounded-full tracking-tighter">Verified Priority</span>
+                                </div>
+                                <p class="text-slate-500 leading-relaxed font-medium">Sizning <span class="text-blue-600 font-bold">#PrivacyFirst</span> maqolangizga qiziqish bildirdi va shaxsiy xabar qoldirdi.</p>
+                                <div class="mt-5 p-5 bg-slate-50 border border-slate-100 rounded-[1.5rem] italic text-slate-700">
+                                    "This implementation of UI is incredibly smooth. High quality work!"
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div x-show="tab === 'all' || tab === 'mentions'" 
+                         x-transition:enter="transition ease-out duration-500 delay-100"
+                         class="group bg-white border border-slate-100 p-8 rounded-[3rem] shadow-[0_10px_40px_rgba(0,0,0,0.02)]">
+                        <div class="flex gap-6">
+                            <div class="w-16 h-16 bg-gradient-to-tr from-indigo-600 to-purple-600 rounded-[1.5rem] flex items-center justify-center shadow-xl shadow-indigo-200">
+                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"></path></svg>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-lg text-slate-900 leading-snug">
+                                    <span class="font-black">Asomiddin_Dev</span> sizni <span class="bg-indigo-50 text-indigo-600 px-2 py-1 rounded-lg font-bold">#AlphaProject</span> loyihasida esladi.
+                                </p>
+                                <div class="mt-4 border-l-4 border-indigo-500 pl-6 py-2">
+                                    <p class="text-slate-500 italic">"Bu dizaynni @asomiddin_dev bilan maslahatlashsak zo'r bo'lardi, ularda g'oya ko'p."</p>
+                                </div>
+                                <div class="mt-6 flex gap-4">
+                                    <button class="px-6 py-2.5 bg-slate-900 text-white text-xs font-black rounded-xl hover:scale-105 transition-transform">Javob qaytarish</button>
+                                    <button class="px-6 py-2.5 border border-slate-200 text-slate-500 text-xs font-black rounded-xl hover:bg-slate-50 transition">Arxivlash</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div x-show="tab === 'all'" 
+                         x-transition:enter="transition ease-out duration-500 delay-200"
+                         class="bg-gradient-to-r from-orange-500 to-pink-600 p-[1px] rounded-[3rem] shadow-2xl shadow-orange-200">
+                        <div class="bg-white rounded-[2.95rem] p-8 flex items-center justify-between">
+                            <div class="flex items-center gap-6">
+                                <div class="w-16 h-16 bg-orange-100 rounded-3xl flex items-center justify-center text-orange-600">
+                                    <svg class="w-9 h-9" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                </div>
+                                <div>
+                                    <h4 class="text-xl font-black text-slate-900 italic">Trenddagi yangilik!</h4>
+                                    <p class="text-slate-500 font-medium">Sizning "Modern UI" darsligingiz bugun 5,000 marta ko'rildi!</p>
+                                </div>
+                            </div>
+                            <button class="bg-slate-900 text-white px-8 py-3.5 rounded-2xl font-black text-xs hover:shadow-xl transition-all">Statistika</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="hidden lg:block col-span-4 space-y-8 sticky top-8 h-fit">
+                <div class="bg-white border border-slate-100 rounded-[3rem] p-10 shadow-xl shadow-slate-200/50">
+                    <div class="flex items-center justify-between mb-10">
+                        <h3 class="text-2xl font-black text-slate-900 tracking-tight">Trendlar</h3>
+                        <div class="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                    </div>
+                    
+                    <div class="space-y-10">
+                        <div class="group cursor-pointer">
+                            <span class="text-[10px] font-black text-blue-500 uppercase tracking-[0.3em]">Hafta mavzusi</span>
+                            <p class="text-lg font-black text-slate-800 group-hover:text-blue-600 transition mt-1">#AlpineJS_Magic</p>
+                            <div class="flex items-center gap-2 mt-2">
+                                <div class="flex -space-x-2">
+                                    <div class="w-6 h-6 rounded-full bg-slate-200 border-2 border-white"></div>
+                                    <div class="w-6 h-6 rounded-full bg-slate-300 border-2 border-white"></div>
+                                </div>
+                                <span class="text-xs text-slate-400 font-bold">+1.2k muhokama</span>
+                            </div>
+                        </div>
+
+                        <div class="group cursor-pointer border-t border-slate-50 pt-8">
+                            <span class="text-[10px] font-black text-purple-500 uppercase tracking-[0.3em]">Loyihalar</span>
+                            <p class="text-lg font-black text-slate-800 group-hover:text-purple-600 transition mt-1">#BladeComponents</p>
+                            <p class="text-xs text-slate-400 mt-1 font-medium">842 kishi ishtirok etmoqda</p>
+                        </div>
+                    </div>
+
+                    <button class="w-full mt-12 py-5 bg-slate-50 hover:bg-slate-900 hover:text-white rounded-[2rem] text-sm font-black transition-all duration-500">
+                        Barchasini ko'rish
                     </button>
                 </div>
 
-                <div class="flex items-center">
-                    <a href="#" class="flex-1 text-center py-3 hover:bg-gray-50 transition relative">
-                        <span class="font-bold text-gray-900 text-sm">All</span>
-                        <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-blue-500 rounded-full"></div>
-                    </a>
-                    <a href="#" class="flex-1 text-center py-3 hover:bg-gray-50 transition text-gray-500 font-medium text-sm">
-                        Verified
-                    </a>
-                    <a href="#" class="flex-1 text-center py-3 hover:bg-gray-50 transition text-gray-500 font-medium text-sm">
-                        Mentions
-                    </a>
+                <div class="bg-indigo-600 rounded-[3rem] p-8 text-white shadow-2xl shadow-indigo-200 relative overflow-hidden">
+                    <div class="relative z-10">
+                        <h4 class="text-lg font-black mb-2">Pro Maslahat:</h4>
+                        <p class="text-indigo-100 text-sm leading-relaxed opacity-80 italic">"Tasdiqlangan foydalanuvchilar bilan ko'proq muloqot qiling, bu sizning reytingingizni oshiradi."</p>
+                    </div>
+                    <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-white opacity-10 rounded-full"></div>
                 </div>
-            </div>
-
-            <div class="divide-y divide-gray-100">
-
-                <div class="flex gap-4 p-4 hover:bg-gray-50 transition cursor-pointer bg-blue-50/30">
-                    <div class="flex-shrink-0 w-8 text-right">
-                        <svg class="w-7 h-7 text-pink-500 ml-auto" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-                    </div>
-                    <div class="flex-1">
-                        <div class="w-8 h-8 rounded-full overflow-hidden mb-2">
-                             <img src="https://ui-avatars.com/api/?name=Elon+Musk&background=000&color=fff" class="w-full h-full object-cover">
-                        </div>
-                        <p class="text-gray-900 text-[15px]">
-                            <span class="font-bold">Elon Musk</span> liked your post
-                        </p>
-                        <p class="text-gray-500 text-sm mt-1 line-clamp-2">
-                            Laravel 11 da papkalar strukturasi ancha soddalashdi. Endi config fayllar ham...
-                        </p>
-                    </div>
-                </div>
-
-                <div class="flex gap-4 p-4 hover:bg-gray-50 transition cursor-pointer">
-                    <div class="flex-shrink-0 w-8 text-right">
-                        <svg class="w-7 h-7 text-blue-500 ml-auto" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-                    </div>
-                    <div class="flex-1">
-                        <div class="flex justify-between items-start">
-                             <div class="w-8 h-8 rounded-full overflow-hidden mb-2">
-                                <img src="https://ui-avatars.com/api/?name=Taylor+Swift&background=random" class="w-full h-full object-cover">
-                            </div>
-                            <button class="px-4 py-1.5 border border-gray-300 rounded-full text-sm font-bold text-gray-900 hover:bg-gray-100 transition">
-                                Follow
-                            </button>
-                        </div>
-                        <p class="text-gray-900 text-[15px]">
-                            <span class="font-bold">Taylor Swift</span> followed you
-                        </p>
-                    </div>
-                </div>
-
-                <div class="flex gap-4 p-4 hover:bg-gray-50 transition cursor-pointer">
-                    <div class="flex-shrink-0 w-8 text-right">
-                        <svg class="w-7 h-7 text-green-500 ml-auto" fill="currentColor" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg>
-                    </div>
-                    <div class="flex-1">
-                        <div class="w-8 h-8 rounded-full overflow-hidden mb-2">
-                             <img src="https://ui-avatars.com/api/?name=Asomiddin&background=random" class="w-full h-full object-cover">
-                        </div>
-                        <p class="text-gray-900 text-[15px]">
-                            <span class="font-bold">Asomiddin</span> replied to your post
-                        </p>
-                        <p class="text-gray-500 text-sm mt-1 text-gray-600">
-                            "Ajoyib maqola bo'libdi! Davomini kutamiz 🔥"
-                        </p>
-                    </div>
-                </div>
-
-                <div class="flex gap-4 p-4 hover:bg-gray-50 transition cursor-pointer">
-                    <div class="flex-shrink-0 w-8 text-right">
-                        <div class="bg-black text-white p-0.5 rounded ml-auto w-6 h-6 flex items-center justify-center">
-                           <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                        </div>
-                    </div>
-                    <div class="flex-1">
-                        <p class="text-gray-900 text-[15px]">
-                            There was a login to your account @asomiddin_dev from a new device on Jan 22, 2026. Review it now.
-                        </p>
-                    </div>
-                </div>
-
-                @foreach(range(1, 5) as $i)
-                    <div class="flex gap-4 p-4 hover:bg-gray-50 transition cursor-pointer">
-                        <div class="flex-shrink-0 w-8 text-right">
-                            <svg class="w-7 h-7 text-pink-500 ml-auto" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-                        </div>
-                        <div class="flex-1">
-                            <div class="w-8 h-8 rounded-full overflow-hidden mb-2">
-                                <img src="https://ui-avatars.com/api/?name=User+{{$i}}&background=random" class="w-full h-full object-cover">
-                            </div>
-                            <p class="text-gray-900 text-[15px]">
-                                <span class="font-bold">User {{$i}}</span> liked your reply
-                            </p>
-                            <p class="text-gray-500 text-sm mt-1 line-clamp-2">
-                                Men ham xuddi shunday fikrdaman...
-                            </p>
-                        </div>
-                    </div>
-                @endforeach
-
             </div>
 
         </div>
-
-        <div class="hidden lg:block col-span-4 pl-4 pt-4">
-             <div class="bg-gray-100 rounded-full flex items-center px-4 py-2.5 mb-6 focus-within:ring-1 focus-within:ring-blue-500 focus-within:bg-white border border-transparent focus-within:border-blue-500 transition">
-                <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                <input type="text" placeholder="Search" class="bg-transparent border-none outline-none text-sm ml-3 w-full placeholder-gray-500 text-gray-900">
-            </div>
-
-            <div class="bg-gray-50 rounded-2xl p-4">
-                <h3 class="font-bold text-xl mb-4 text-gray-900">Trends for you</h3>
-                
-                <div class="space-y-4">
-                    <div class="cursor-pointer hover:bg-gray-100 p-2 -mx-2 rounded-lg transition">
-                        <p class="text-xs text-gray-500">Trending in Uzbekistan</p>
-                        <p class="font-bold text-gray-900">#Laravel11</p>
-                        <p class="text-xs text-gray-500">2,453 posts</p>
-                    </div>
-                     <div class="cursor-pointer hover:bg-gray-100 p-2 -mx-2 rounded-lg transition">
-                        <p class="text-xs text-gray-500">Technology · Trending</p>
-                        <p class="font-bold text-gray-900">#Livewire</p>
-                        <p class="text-xs text-gray-500">12k posts</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
     </div>
 </x-app-layout>

@@ -28,10 +28,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
     Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
     Route::post('/posts/{post}/like', [LikeController::class, 'toggle'])->name('posts.like');
+    Route::patch('/posts/{post}', [PostController::class, 'update'])->name('posts.update');
 
     // --- 3. YANGI: COMMENT ROUTES ---
     Route::post('/posts/{post}/comments', [CommentController::class, 'store'])->name('comments.store');
     Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
+    // Post routelari qatoriga qo'shing
+    Route::post('/posts/{post}/view', [PostController::class, 'incrementView'])->name('posts.view');
 
 
     // --- PROFILE YO'NALTIRISH ---

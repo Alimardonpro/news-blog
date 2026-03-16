@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule; // <--- BU QATOR BORLIGINI TEKSHIRING!
+use Illuminate\Validation\Rule;
 
 class ProfileUpdateRequest extends FormRequest
 {
@@ -18,15 +18,16 @@ class ProfileUpdateRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             
-            // --- USERNAME TEKSHIRUVI ---
+            // --- USERNAME ---
             'username' => [
                 'required', 
                 'string', 
                 'max:255', 
-                'alpha_dash', // Faqat harf, raqam va chiziqcha ruxsat beradi (probel yo'q)
-                Rule::unique(User::class)->ignore($this->user()->id), // O'zidan boshqa hamma bilan solishtiradi
+                'alpha_dash', 
+                Rule::unique(User::class)->ignore($this->user()->id),
             ],
 
+            // --- EMAIL ---
             'email' => [
                 'required', 
                 'string', 
@@ -37,6 +38,22 @@ class ProfileUpdateRequest extends FormRequest
             ],
             
             'bio' => ['nullable', 'string', 'max:1000'],
+
+            // --- 🟢 YANGI QO'SHILGAN QISMLAR (RASMLAR UCHUN) ---
+            
+            'avatar' => [
+                'nullable', 
+                'image', // Fayl rasm bo'lishi shart
+                'mimes:jpeg,png,jpg,gif,webp', // Ruxsat etilgan formatlar (WEBP ham qo'shildi)
+                'max:10240', // Maksimum 10 MB (10240 KB)
+            ],
+
+            'banner' => [
+                'nullable', 
+                'image', 
+                'mimes:jpeg,png,jpg,gif,webp', 
+                'max:10240', // Maksimum 10 MB
+            ],
         ];
     }
 }
