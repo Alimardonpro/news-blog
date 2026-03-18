@@ -113,12 +113,14 @@
                 <div class="avatar-wrapper" style="top: 10%; right: 15%; animation-duration: 100s;"><img src="https://i.pravatar.cc/150?u=2" class="avatar-img"></div>
                 <div class="avatar-wrapper" style="bottom: 10%; left: 15%; animation-duration: 100s;"><img src="https://i.pravatar.cc/150?u=3" class="avatar-img"></div>
                 <div class="avatar-wrapper" style="bottom: 10%; right: 15%; animation-duration: 100s;"><img src="https://i.pravatar.cc/150?u=4" class="avatar-img"></div>
+                <div class="avatar-wrapper" style="bottom: 10%; right: 15%; animation-duration: 100s;"><img src="" class="avatar-img"></div>
+         
             </div>
 
             <div class="orbit-circle w-[650px] h-[650px]" style="animation-duration: 80s; animation-direction: reverse;">
                 <div class="avatar-wrapper" style="top: 50%; left: -30px; animation-duration: 80s; animation-direction: reverse;"><img src="https://i.pravatar.cc/150?u=5" class="avatar-img"></div>
                 <div class="avatar-wrapper" style="bottom: 5%; right: 25%; animation-duration: 80s; animation-direction: reverse;"><img src="https://i.pravatar.cc/150?u=6" class="avatar-img"></div>
-            </div>
+            </div> 
 
             <div class="orbit-circle w-[480px] h-[480px]" style="animation-duration: 60s;">
                 <div class="avatar-wrapper" style="top: -30px; left: 50%; transform: translateX(-50%); animation-duration: 60s;"><img src="https://i.pravatar.cc/150?u=8" class="avatar-img"></div>

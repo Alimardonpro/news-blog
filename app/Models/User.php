@@ -18,7 +18,6 @@ class User extends Authenticatable
         'avatar', 
         'banner',
         'bio',     
-
     ];
 
     protected $hidden = [
@@ -46,36 +45,33 @@ class User extends Authenticatable
         return $this->hasMany(Like::class);
     }
 
-    // 3. Men obuna bo'lganlar (Following)
-    // 'follows' jadvalidan foydalanamiz. Men 'follower_id' man.
+    // 3. Men obuna bo'lganlar (Men kuzatayotgan odamlar)
     public function following()
     {
         return $this->belongsToMany(User::class, 'follows', 'follower_id', 'following_id')
                     ->withTimestamps();
     }
 
-    // 4. Menga obuna bo'lganlar (Followers)
-    // 'follows' jadvalidan foydalanamiz. Men 'following_id' man.
+    // 4. Menga obuna bo'lganlar (Mening obunachilarim)
     public function followers()
     {
         return $this->belongsToMany(User::class, 'follows', 'following_id', 'follower_id')
                     ->withTimestamps();
     }
 
-    // Yordamchi funksiya: Men ma'lum bir odamga obuna bo'lganmanmi?
-    // Frontendda "Follow" yoki "Unfollow" tugmasini ko'rsatish uchun kerak.
+    // 5. Yordamchi funksiya: Men shu odamni kuzatyapmanmi?
     public function isFollowing(User $user)
     {
         return $this->following()->where('following_id', $user->id)->exists();
     }
 
-    // Foydalanuvchi yuborgan xabarlar
+    // 6. Foydalanuvchi yuborgan xabarlar (Chat uchun muhim)
     public function sentMessages()
     {
         return $this->hasMany(Message::class, 'sender_id');
     }
 
-    // Foydalanuvchi qabul qilgan xabarlar
+    // 7. Foydalanuvchi qabul qilgan xabarlar (Chat uchun muhim)
     public function receivedMessages()
     {
         return $this->hasMany(Message::class, 'receiver_id');

@@ -233,7 +233,7 @@
                     </div>
 
                     <!-- XAT YOZISH (INPUT) QISMI -->
-                    <div class="p-3 lg:p-4 bg-white border-t border-slate-100 shrink-0 pb-safe">
+                    <div class="p-3 mb-2 lg:p-4 bg-white border-t border-slate-100 shrink-0 pb-safe">
                         <form @submit.prevent="sendMessage" class="flex items-center gap-2 lg:gap-3 bg-slate-50 border border-slate-200 p-1 lg:p-1.5 rounded-[1.2rem] lg:rounded-2xl focus-within:bg-white focus-within:ring-2 focus-within:ring-indigo-100 transition-all duration-300 shadow-sm">
                             <input type="text" x-model="newMessage" :placeholder="editingMessageId ? 'Xabarni tahrirlash...' : 'Xabar yozing...'" class="flex-1 bg-transparent border-none focus:ring-0 text-[14px] lg:text-[15px] text-slate-900 py-2 outline-none pl-4">
                             <template x-if="editingMessageId">
