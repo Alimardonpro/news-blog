@@ -68,4 +68,16 @@ class User extends Authenticatable
     {
         return $this->following()->where('following_id', $user->id)->exists();
     }
+
+    // Foydalanuvchi yuborgan xabarlar
+    public function sentMessages()
+    {
+        return $this->hasMany(Message::class, 'sender_id');
+    }
+
+    // Foydalanuvchi qabul qilgan xabarlar
+    public function receivedMessages()
+    {
+        return $this->hasMany(Message::class, 'receiver_id');
+    }
 }
