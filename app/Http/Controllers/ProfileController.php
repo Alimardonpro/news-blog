@@ -2,103 +2,82 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ProfileUpdateRequest;
-use Illuminate\Http\RedirectResponse;
+use App\Models\User;
+use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Storage; // <--- MUHIM: Faylni o'chirish uchun kerak
-use Illuminate\View\View;
-use App\Models\User;
+use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
-    /**
-     * Boshqa foydalanuvchining profilini ko'rsatish (@username).
-     */
+    // Profilni ko'rsatish
     public function show($username)
     {
-        // 1. Bazadan username bo'yicha qidiramiz
-        // firstOrFail -> Agar topilmasa 404 xato beradi
+        $user = User::where('username', $username)
+            ->withCount(['followers', 'following'])
+            ->firstOrFail();
+
+        $posts = $user->posts()
+            ->withCount(['likes', 'comments', 'views'])
+            ->get();
+
+        return view('profile', compact('user', 'posts'));
+    }
+
+    // Obunachilar va Kuzatilayotganlar ro'yxati
+    public function usersList($username, $type)
+    {
         $user = User::where('username', $username)->firstOrFail();
-
-        // 2. Profile sahifasini ochamiz va topilgan $user ni yuboramiz
-        return view('profile', [
-            'user' => $user,
-        ]);
-    }
-
-    /**
-     * Display the user's profile form.
-     */
-    public function edit(Request $request): View
-    {
-        return view('profile.edit', [
-            'user' => $request->user(),
-        ]);
-    }
-
-    /**
-     * Update the user's profile information.
-     */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
-    {
-        // Validatsiya qilingan ma'lumotlarni to'ldirish
-        $request->user()->fill($request->validated());
-
-        // Agar email o'zgargan bo'lsa, verifikatsiyani bekor qilish
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        
+        if ($type === 'followers') {
+            $users = $user->followers()->paginate(20);
+            $title = "Obunachilar";
+        } else {
+            $users = $user->following()->paginate(20);
+            $title = "Kuzatilayotganlar";
         }
 
-        // --- 1. AVATAR YUKLASH MANTIQI ---
+        return view('profile.users-list', compact('users', 'title', 'user'));
+    }
+
+    // Lenta (Obuna bo'linganlar posti)
+    public function feed()
+    {
+        $followingIds = Auth::user()->following()->pluck('following_id');
+        $feedPosts = Post::whereIn('user_id', $followingIds)
+            ->with('user')
+            ->withCount(['likes', 'comments', 'views'])
+            ->latest()
+            ->paginate(15);
+
+        return view('feed', compact('feedPosts'));
+    }
+
+    public function edit() {
+        $user = Auth::user();
+        return view('profile.edit', compact('user'));
+    }
+
+    public function update(Request $request) {
+        $user = Auth::user();
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'username' => 'required|string|max:255|unique:users,username,' . $user->id,
+            'bio' => 'nullable|string|max:1000',
+            'avatar' => 'nullable|image|max:2048',
+            'banner' => 'nullable|image|max:3072',
+        ]);
+
         if ($request->hasFile('avatar')) {
-            // Agar eski avatar bo'lsa, uni o'chirib tashlaymiz
-            if ($request->user()->avatar) {
-                Storage::disk('public')->delete($request->user()->avatar);
-            }
-            // Yangi avatarni saqlaymiz
-            $path = $request->file('avatar')->store('avatars', 'public');
-            $request->user()->avatar = $path;
+            if ($user->avatar) Storage::disk('public')->delete($user->avatar);
+            $data['avatar'] = $request->file('avatar')->store('avatars', 'public');
         }
-
-        // --- 2. BANNER YUKLASH MANTIQI (YANGI) ---
         if ($request->hasFile('banner')) {
-            // Agar eski banner bo'lsa, uni o'chirib tashlaymiz
-            if ($request->user()->banner) {
-                Storage::disk('public')->delete($request->user()->banner);
-            }
-            // Yangi bannerni saqlaymiz
-            $path = $request->file('banner')->store('banners', 'public');
-            $request->user()->banner = $path;
+            if ($user->banner) Storage::disk('public')->delete($user->banner);
+            $data['banner'] = $request->file('banner')->store('banners', 'public');
         }
 
-        // O'zgarishlarni saqlash
-        $request->user()->save();
-
-        // Profil sahifasiga qaytarish (username bilan)
-        return Redirect::route('profile.show', ['username' => $request->user()->username])
-            ->with('status', 'profile-updated');
-    }
-
-    /**
-     * Delete the user's account.
-     */
-    public function destroy(Request $request): RedirectResponse
-    {
-        $request->validateWithBag('userDeletion', [
-            'password' => ['required', 'current_password'],
-        ]);
-
-        $user = $request->user();
-
-        Auth::logout();
-
-        $user->delete();
-
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return Redirect::to('/');
+        $user->update($data);
+        return redirect()->route('profile.show', $user->username);
     }
 }

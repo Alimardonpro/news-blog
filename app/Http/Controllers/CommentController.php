@@ -2,39 +2,40 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Comment;
 use App\Models\Post;
+use App\Models\Comment;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Notifications\PostCommented;
 
 class CommentController extends Controller
 {
-    // Izoh yozish
     public function store(Request $request, Post $post)
     {
         $request->validate([
-            'body' => 'required|string|max:500',
+            'body' => 'required|string|max:1000',
         ]);
 
-        Comment::create([
-            'user_id' => Auth::id(),
-            'post_id' => $post->id,
+        // 1. Kommentni bazaga saqlaymiz va $comment o'zgaruvchisiga olamiz
+        $comment = $post->comments()->create([
+            'user_id' => auth()->id(),
             'body' => $request->body,
         ]);
 
-        return back(); // Turgan joyiga qaytaradi
+        // 2. O'zimizning postimiz bo'lmasa, xabar yuboramiz (komment matnini ham qo'shib)
+        if ($post->user_id !== auth()->id()) {
+            $post->user->notify(new PostCommented(auth()->user(), $comment));
+        }
+
+        return back();
     }
 
-    // Izohni o'chirish
     public function destroy(Comment $comment)
     {
-        // Faqat o'zining izohini o'chira olsin
-        if (Auth::id() !== $comment->user_id) {
+        if (auth()->id() !== $comment->user_id) {
             abort(403);
         }
 
         $comment->delete();
-
         return back();
     }
 }

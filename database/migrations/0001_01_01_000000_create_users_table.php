@@ -21,6 +21,7 @@ return new class extends Migration
             $table->text('bio')->nullable();      // Yangi: O'zi haqida
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->timestamp('last_seen')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

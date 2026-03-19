@@ -6,6 +6,9 @@ use App\Models\Message;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
+use App\Events\MessageSent;
+use App\Events\MessageRead;
 
 class ChatController extends Controller
 {
@@ -13,52 +16,75 @@ class ChatController extends Controller
     public function index(Request $request)
     {
         $myId = Auth::id();
-        
-        // Faqat o'zaro yozishgan odamlarni olish
+        $hasIsRead = Schema::hasColumn('messages', 'is_read');
+
         $users = User::where('id', '!=', $myId)
             ->where(function ($query) use ($myId) {
-                $query->whereHas('sentMessages', function($q) use ($myId) {
+                $query->whereHas('sentMessages', function ($q) use ($myId) {
                     $q->where('receiver_id', $myId);
-                })->orWhereHas('receivedMessages', function($q) use ($myId) {
+                })->orWhereHas('receivedMessages', function ($q) use ($myId) {
                     $q->where('sender_id', $myId);
                 });
             })
+            ->withCount(['sentMessages as unread_count' => function ($query) use ($myId, $hasIsRead) {
+                $query->where('receiver_id', $myId);
+
+                if ($hasIsRead) {
+                    $query->where('is_read', false);
+                } else {
+                    $query->whereNull('read_at');
+                }
+            }])
             ->get();
 
-        // YANGI: Profildan "Xabar yuborish" bosilganda shu odamni ushlab olamiz
-        $startWithUser = null;
-        if ($request->has('start_with')) {
-            $startWithUser = User::find($request->get('start_with'));
+        $startUser = null;
+
+        if ($request->has('user_id')) {
+            $startUser = User::find($request->get('user_id'));
+
+            if ($startUser && !$users->contains('id', $startUser->id)) {
+                $startUser->unread_count = 0;
+                $users->prepend($startUser);
+            }
         }
 
-        // View nomini o'zingiznikiga moslang (masalan, 'chat.index' yoki 'chat')
-        return view('chat', compact('users', 'startWithUser')); 
+        return view('chat', compact('users', 'startUser'));
     }
 
-    // 2. Global qidiruv
-    public function searchUsers(Request $request)
-    {
-        $query = $request->get('q');
-        
-        if (!$query) {
-            return response()->json([]);
-        }
-
-        $users = User::where('id', '!=', Auth::id())
-            ->where(function($q) use ($query) {
-                $q->where('name', 'like', "%{$query}%")
-                  ->orWhere('username', 'like', "%{$query}%");
-            })
-            ->limit(10)
-            ->get();
-
-        return response()->json($users);
-    }
-
-    // 3. Xabarlarni olish
+    // 2. Xabarlarni olish va o'qildi deb belgilash
     public function getMessages(User $user)
     {
         $myId = Auth::id();
+        $hasIsRead = Schema::hasColumn('messages', 'is_read');
+
+        $unreadQuery = Message::where('sender_id', $user->id)
+            ->where('receiver_id', $myId);
+
+        if ($hasIsRead) {
+            $unreadQuery->where('is_read', false);
+        } else {
+            $unreadQuery->whereNull('read_at');
+        }
+
+        $unreadMessages = $unreadQuery->get();
+
+        if ($unreadMessages->count() > 0) {
+            foreach ($unreadMessages as $msg) {
+                if ($hasIsRead) {
+                    $msg->update(['is_read' => true]);
+                } else {
+                    $msg->update(['read_at' => now()]);
+                }
+
+                // Xabar yuborgan odamga: "sening xabaring o'qildi" deb signal yuboriladi
+                broadcast(new MessageRead(
+                    $msg->id,
+                    $msg->sender_id,
+                    $myId
+                ))->toOthers();
+            }
+        }
+
         $messages = Message::where(function ($q) use ($myId, $user) {
             $q->where('sender_id', $myId)->where('receiver_id', $user->id);
         })->orWhere(function ($q) use ($myId, $user) {
@@ -68,43 +94,97 @@ class ChatController extends Controller
         return response()->json($messages);
     }
 
-    // 4. Xabar yuborish
+    // 3. Xabar yuborish
     public function sendMessage(Request $request, User $user)
     {
-        $request->validate(['message' => 'required|string|max:2000']);
-        $message = Message::create([
-            'sender_id' => Auth::id(),
-            'receiver_id' => $user->id,
-            'message' => $request->message,
+        $request->validate([
+            'message' => 'nullable|string|max:2000',
+            'image'   => 'nullable|image|max:5120',
+            'audio'   => 'nullable|file|max:10240',
+            'video'   => 'nullable|file|mimes:mp4,mov,ogg,qt,webm|max:51200',
         ]);
+
+        if (!$request->filled('message') && !$request->hasFile('image') && !$request->hasFile('audio') && !$request->hasFile('video')) {
+            return response()->json(['error' => 'Bo‘sh xabar yuborib bo‘lmaydi'], 422);
+        }
+
+        $data = [
+            'sender_id'   => Auth::id(),
+            'receiver_id' => $user->id,
+            'message'     => $request->message,
+            'image'       => $request->hasFile('image') ? $request->file('image')->store('chat_images', 'public') : null,
+            'audio'       => $request->hasFile('audio') ? $request->file('audio')->store('chat_audios', 'public') : null,
+            'video'       => $request->hasFile('video') ? $request->file('video')->store('chat_videos', 'public') : null,
+        ];
+
+        if (Schema::hasColumn('messages', 'is_read')) {
+            $data['is_read'] = false;
+        } elseif (Schema::hasColumn('messages', 'read_at')) {
+            $data['read_at'] = null;
+        }
+
+        $message = Message::create($data);
+
+        broadcast(new MessageSent($message))->toOthers();
+
         return response()->json($message);
+    }
+
+    // 4. Umumiy o'qilmaganlar soni
+    public function getTotalUnread()
+    {
+        $query = Message::where('receiver_id', Auth::id());
+
+        if (Schema::hasColumn('messages', 'is_read')) {
+            $query->where('is_read', false);
+        } else {
+            $query->whereNull('read_at');
+        }
+
+        $count = $query->count();
+        $notifCount = Auth::user()->unreadNotifications->count();
+
+        return response()->json([
+            'count' => $count,
+            'notif_count' => $notifCount
+        ]);
     }
 
     // 5. Xabarni tahrirlash
     public function updateMessage(Request $request, Message $message)
     {
-        if ($message->sender_id === Auth::id()) {
-            $request->validate(['message' => 'required|string|max:2000']);
-            $message->update(['message' => $request->message]);
-            return response()->json($message);
+        if ($message->sender_id !== Auth::id()) {
+            return response()->json(['error' => 'Ruxsat etilmagan'], 403);
         }
-        return response()->json(['error' => 'Ruxsat etilmagan'], 403);
+
+        $request->validate([
+            'message' => 'required|string|max:2000'
+        ]);
+
+        $message->update([
+            'message' => $request->message
+        ]);
+
+        return response()->json($message);
     }
 
     // 6. Xabarni o'chirish
-    public function destroyMessage(Message $message)
+    public function deleteMessage(Message $message)
     {
-        if ($message->sender_id === Auth::id()) {
-            $message->delete();
-            return response()->json(['success' => true]);
+        if ($message->sender_id !== Auth::id() && $message->receiver_id !== Auth::id()) {
+            return response()->json(['error' => 'Ruxsat etilmagan'], 403);
         }
-        return response()->json(['error' => 'Ruxsat etilmagan'], 403);
+
+        $message->delete();
+
+        return response()->json(['success' => true]);
     }
 
-    // 7. Tarixni tozalash
-    public function clearConversation(User $user)
+    // 7. Chatni tozalash
+    public function clearChat(User $user)
     {
         $myId = Auth::id();
+
         Message::where(function ($q) use ($myId, $user) {
             $q->where('sender_id', $myId)->where('receiver_id', $user->id);
         })->orWhere(function ($q) use ($myId, $user) {
@@ -112,5 +192,29 @@ class ChatController extends Controller
         })->delete();
 
         return response()->json(['success' => true]);
+    }
+
+    // 8. Global foydalanuvchilarni qidirish
+    public function searchUsers(Request $request)
+    {
+        $q = $request->get('q');
+
+        if (!$q) {
+            return response()->json([]);
+        }
+
+        $users = User::where('id', '!=', Auth::id())
+            ->where(function ($query) use ($q) {
+                $query->where('name', 'like', "%{$q}%")
+                      ->orWhere('username', 'like', "%{$q}%");
+            })
+            ->limit(20)
+            ->get();
+
+        $users->each(function ($user) {
+            $user->unread_count = 0;
+        });
+
+        return response()->json($users);
     }
 }

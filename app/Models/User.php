@@ -11,18 +11,11 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     protected $fillable = [
-        'name',
-        'username', 
-        'email',
-        'password',
-        'avatar', 
-        'banner',
-        'bio',     
+        'name', 'username', 'email', 'password', 'avatar', 'banner', 'bio' , 'last_seen',
     ];
 
     protected $hidden = [
-        'password',
-        'remember_token',
+        'password', 'remember_token',
     ];
 
     protected function casts(): array
@@ -33,47 +26,47 @@ class User extends Authenticatable
         ];
     }
 
-    // 1. Mening Postlarim (User -> Posts)
+    // 1. POSTLAR BILAN BOG'LIQLIK
     public function posts()
     {
-        return $this->hasMany(Post::class)->latest(); // Eng yangilari birinchi chiqadi
+        return $this->hasMany(Post::class)->latest();
     }
 
-    // 2. Men bosgan Likelar (User -> Likes)
-    public function likes()
-    {
-        return $this->hasMany(Like::class);
-    }
-
-    // 3. Men obuna bo'lganlar (Men kuzatayotgan odamlar)
+    // 2. OBUNALAR (Following/Followers)
     public function following()
     {
-        return $this->belongsToMany(User::class, 'follows', 'follower_id', 'following_id')
-                    ->withTimestamps();
+        return $this->belongsToMany(User::class, 'follows', 'follower_id', 'following_id')->withTimestamps();
     }
 
-    // 4. Menga obuna bo'lganlar (Mening obunachilarim)
     public function followers()
     {
-        return $this->belongsToMany(User::class, 'follows', 'following_id', 'follower_id')
-                    ->withTimestamps();
+        return $this->belongsToMany(User::class, 'follows', 'following_id', 'follower_id')->withTimestamps();
     }
 
-    // 5. Yordamchi funksiya: Men shu odamni kuzatyapmanmi?
     public function isFollowing(User $user)
     {
         return $this->following()->where('following_id', $user->id)->exists();
     }
 
-    // 6. Foydalanuvchi yuborgan xabarlar (Chat uchun muhim)
+    // 3. CHAT XABARLARI
     public function sentMessages()
     {
         return $this->hasMany(Message::class, 'sender_id');
     }
 
-    // 7. Foydalanuvchi qabul qilgan xabarlar (Chat uchun muhim)
     public function receivedMessages()
     {
         return $this->hasMany(Message::class, 'receiver_id');
+    }
+
+    // 4. LIKELAR VA KOMMENTLAR
+    public function likes()
+    {
+        return $this->hasMany(Like::class);
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
     }
 }

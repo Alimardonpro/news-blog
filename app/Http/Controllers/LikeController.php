@@ -3,30 +3,32 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
-use App\Models\Like;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Notifications\PostLiked;
 
 class LikeController extends Controller
 {
     public function toggle(Post $post)
     {
-        // 1. User allaqachon like bosganmi tekshiramiz
-        $like = Like::where('post_id', $post->id)
-                    ->where('user_id', Auth::id())
-                    ->first();
+        $user = auth()->user();
+        
+        // 1. Foydalanuvchi shu postga layk bosganmi, yo'qmi tekshiramiz
+        $like = $post->likes()->where('user_id', $user->id)->first();
 
         if ($like) {
-            // Agar bor bo'lsa -> O'CHIRAMIZ (Unlike)
+            // 2. Agar oldin layk bosgan bo'lsa, laykni qaytarib olamiz (o'chiramiz)
             $like->delete();
         } else {
-            // Agar yo'q bo'lsa -> YARATAMIZ (Like)
-            Like::create([
-                'post_id' => $post->id,
-                'user_id' => Auth::id(),
-            ]);
+            // 3. Agar bosmagan bo'lsa, yangi layk qo'shamiz
+            $post->likes()->create(['user_id' => $user->id]);
+
+            // 4. Va aynan mana shu paytda (faqat layk BOSILGANDA) xabar yuboramiz
+            // O'ziga o'zi layk bossa, xabar bormaydi
+            if ($post->user_id !== $user->id) {
+                $post->user->notify(new PostLiked($user));
+            }
         }
 
-        return back(); // Turgan sahifasiga qaytaradi
+        return back();
     }
 }
