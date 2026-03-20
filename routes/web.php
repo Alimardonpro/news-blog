@@ -71,6 +71,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/@{username}/{type}', [ProfileController::class, 'usersList'])
         ->name('profile.users')
         ->where('type', 'followers|following');
+    // new routing every day
 }); 
 
 require __DIR__.'/auth.php';
