@@ -15,15 +15,16 @@ class CommentController extends Controller
             'body' => 'required|string|max:1000',
         ]);
 
-        // 1. Kommentni bazaga saqlaymiz va $comment o'zgaruvchisiga olamiz
+        // 1. Kommentni bazaga saqlaymiz
         $comment = $post->comments()->create([
             'user_id' => auth()->id(),
             'body' => $request->body,
         ]);
 
-        // 2. O'zimizning postimiz bo'lmasa, xabar yuboramiz (komment matnini ham qo'shib)
+        // 2. Bildirishnoma yuborish (3 ta argument bilan: Kim, Nima, Qaysi post)
         if ($post->user_id !== auth()->id()) {
-            $post->user->notify(new PostCommented(auth()->user(), $comment));
+            // MANA BU YERGA $post QO'SHILDI:
+            $post->user->notify(new PostCommented(auth()->user(), $comment, $post));
         }
 
         return back();
@@ -31,7 +32,8 @@ class CommentController extends Controller
 
     public function destroy(Comment $comment)
     {
-        if (auth()->id() !== $comment->user_id) {
+        // O'chirayotgan odam izoh egasi yoki post egasi ekanini tekshirish
+        if (auth()->id() !== $comment->user_id && auth()->id() !== $comment->post->user_id) {
             abort(403);
         }
 

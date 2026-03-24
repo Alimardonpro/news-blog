@@ -16,63 +16,87 @@
 
                 <div class="space-y-6">
 
-                    <!-- BAZADAN KELAYOTGAN XABARLAR UCHUN TSIKL -->
                     @forelse($notifications as $notification)
-                        <div x-show="tab === 'all'" 
+                        <div x-data="{ showReply: false }"
+                             x-show="tab === 'all'" 
                              x-transition:enter="transition ease-out duration-500"
                              class="group p-8 rounded-[3rem] shadow-[0_10px_40px_rgba(0,0,0,0.02)] hover:shadow-[0_30px_60px_rgba(0,0,0,0.06)] hover:-translate-y-1.5 transition-all duration-500 
                              {{ $notification->read_at ? 'bg-white border border-slate-200' : 'bg-blue-50/60 border border-blue-200 shadow-blue-500/5' }}">
+                            
                             <div class="flex items-start gap-6">
                                 
                                 <div class="relative shrink-0">
-                                    <!-- Rasm -->
-                                    <img src="{{ $notification->data['avatar'] ? asset('storage/'.$notification->data['avatar']) : 'https://ui-avatars.com/api/?name='.urlencode($notification->data['name']).'&background=0088cc&color=fff' }}" class="w-16 h-16 sm:w-20 sm:h-20 rounded-[2rem] shadow-xl ring-4 ring-slate-50 object-cover">
+                                    <img src="{{ isset($notification->data['avatar']) ? asset('storage/'.$notification->data['avatar']) : 'https://ui-avatars.com/api/?name='.urlencode($notification->data['name'] ?? 'U').'&background=0088cc&color=fff' }}" class="w-16 h-16 sm:w-20 sm:h-20 rounded-[2rem] shadow-xl ring-4 ring-slate-50 object-cover">
                                     
-                                    <!-- Turi bo'yicha Ikonkalar (Layk: Qizil, Follow: Ko'k, Komment: Yashil) -->
                                     <div class="absolute -bottom-2 -right-2 p-1.5 rounded-full border-[4px] border-white text-white 
-                                        @if($notification->data['type'] === 'like') bg-red-500 
-                                        @elseif($notification->data['type'] === 'comment') bg-emerald-500 
+                                        @if(($notification->data['type'] ?? '') === 'like') bg-red-500 
+                                        @elseif(($notification->data['type'] ?? '') === 'comment') bg-emerald-500 
                                         @else bg-blue-500 @endif">
                                         
-                                        @if($notification->data['type'] === 'like')
-                                            <!-- Yurakcha (Like) -->
-                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" fill-rule="evenodd"></path></svg>
-                                        @elseif($notification->data['type'] === 'comment')
-                                            <!-- Chat / Komment -->
-                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd"></path></svg>
+                                        @if(($notification->data['type'] ?? '') === 'like')
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"></path></svg>
+                                        @elseif(($notification->data['type'] ?? '') === 'comment')
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7z" clip-rule="evenodd"></path></svg>
                                         @else
-                                            <!-- Odam (Follow) -->
-                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M8 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" fill-rule="evenodd"></path></svg>
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M8 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"></path></svg>
                                         @endif
                                     </div>
                                 </div>
                                 
                                 <div class="flex-1 min-w-0">
-                                    <div class="flex justify-between items-center mb-1">
-                                        <a href="{{ route('profile.show', $notification->data['username']) }}" class="text-lg sm:text-xl font-black text-slate-900 hover:text-blue-600 transition truncate">
-                                            {{ $notification->data['name'] }}
-                                        </a>
-                                        <span class="text-[12px] font-black text-slate-400 ml-2 whitespace-nowrap">{{ $notification->created_at->diffForHumans() }}</span>
+                                    <div class="flex justify-between items-start mb-1">
+                                        <div class="min-w-0">
+                                            <a href="{{ route('profile.show', ['username' => $notification->data['username'] ?? '#']) }}" class="text-lg sm:text-xl font-black text-slate-900 hover:text-blue-600 transition truncate block">
+                                                {{ $notification->data['name'] ?? 'Foydalanuvchi' }}
+                                            </a>
+                                            <span class="text-blue-600 font-bold text-sm hover:underline italic block">
+                                                {{ '@' . ($notification->data['username'] ?? 'user') }}
+                                            </span>
+                                        </div>
+                                        <span class="text-[11px] font-black text-slate-400 ml-2 whitespace-nowrap bg-slate-100 px-3 py-1 rounded-full uppercase">{{ $notification->created_at->diffForHumans() }}</span>
                                     </div>
                                     
-                                    <a href="{{ route('profile.show', $notification->data['username']) }}" class="text-blue-600 font-bold text-sm mb-3 block hover:underline">
-                                        {{ '@' . $notification->data['username'] }}
-                                    </a>
-                                    
-                                    <p class="text-slate-800 leading-relaxed font-bold text-[15px]">
-                                        {{ $notification->data['message'] }}
+                                    <p class="text-slate-800 leading-relaxed font-bold text-[15px] mt-2">
+                                        {{ $notification->data['message'] ?? '' }}
                                     </p>
 
-                                    @if($notification->data['type'] === 'comment' && isset($notification->data['comment_text']))
-                                        <div class="mt-4 p-4 bg-emerald-50/80 border border-emerald-100 rounded-2xl italic text-slate-900 text-[15px] font-bold border-l-4 border-l-emerald-500 shadow-sm">
-                                            "{{ $notification->data['comment_text'] }}"
+                                    @if(isset($notification->data['post_id']))
+                                        <a href="{{ url('/posts/'.$notification->data['post_id']) }}" class="mt-4 flex items-center gap-4 bg-slate-100/50 p-3 rounded-2xl border border-slate-100 w-fit group hover:bg-slate-200 transition">
+                                            @if(isset($notification->data['post_image']))
+                                                <img src="{{ asset('storage/' . $notification->data['post_image']) }}" class="w-12 h-12 rounded-xl object-cover shadow-sm group-hover:scale-105 transition duration-300">
+                                            @else
+                                                <div class="w-12 h-12 rounded-xl bg-slate-200 flex items-center justify-center text-[10px] text-slate-400">Rasm yo'q</div>
+                                            @endif
+                                            <span class="text-[12px] font-black text-slate-500 pr-2">Postni ko'rish →</span>
+                                        </a>
+                                    @endif
+
+                                    @if(($notification->data['type'] ?? '') === 'comment')
+                                        @if(isset($notification->data['comment_text']))
+                                            <div class="mt-4 p-4 bg-emerald-50/80 border border-emerald-100 rounded-2xl italic text-slate-900 text-[15px] font-bold border-l-4 border-l-emerald-500 shadow-sm relative">
+                                                "{{ $notification->data['comment_text'] }}"
+                                                
+                                                <button @click="showReply = !showReply" class="absolute -bottom-3 -right-2 bg-white border border-emerald-200 text-emerald-600 text-[11px] font-black px-4 py-1.5 rounded-full shadow-sm hover:bg-emerald-600 hover:text-white transition-all">
+                                                    JAVOB QAYTARISH
+                                                </button>
+                                            </div>
+                                        @endif
+
+                                        <div x-show="showReply" x-transition class="mt-8 space-y-3">
+                                            <form action="{{ route('comments.store', $notification->data['post_id'] ?? 0) }}" method="POST">
+                                                @csrf
+                                                <textarea name="body" placeholder="Javobingizni yozing..." class="w-full bg-white border-2 border-slate-100 rounded-[1.5rem] p-4 text-sm font-bold focus:ring-0 focus:border-blue-500 transition-all outline-none resize-none" required></textarea>
+                                                <div class="flex justify-end gap-2 mt-2">
+                                                    <button type="button" @click="showReply = false" class="text-[12px] font-black text-slate-400 px-4 py-2 uppercase">Bekor qilish</button>
+                                                    <button type="submit" class="bg-blue-600 text-white text-[12px] font-black px-6 py-2 rounded-full shadow-lg shadow-blue-200 hover:bg-blue-700 transition">YUBORISH</button>
+                                                </div>
+                                            </form>
                                         </div>
                                     @endif
                                 </div>
                             </div>
                         </div>
                     @empty
-                        <!-- AGAR XABAR BO'LMASA -->
                         <div class="bg-white border border-slate-200 p-10 rounded-[3rem] text-center shadow-sm">
                             <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
                                 <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
@@ -85,7 +109,6 @@
                 </div>
             </div>
 
-            <!-- O'NG TOMON (Trendlar - Pro Maslahat) -->
             <div class="hidden lg:block col-span-4 space-y-8 sticky top-8 h-fit">
                 <div class="bg-indigo-600 rounded-[3rem] p-8 text-white shadow-2xl shadow-indigo-200 relative overflow-hidden">
                     <div class="relative z-10">

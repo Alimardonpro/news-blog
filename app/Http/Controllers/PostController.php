@@ -10,120 +10,138 @@ use App\Models\PostView;
 
 class PostController extends Controller
 {
-    // 1. Postni saqlash (CREATE)
+    // 1. Postni ko'rish
+    public function show(Post $post)
+    {
+        return view('dashboard', ['posts' => collect([$post])]); 
+    }
+
+    // 2. Postni saqlash (CREATE) - BIR NECHTA RASM UCHUN MOSLASHTIRILDI
     public function store(Request $request)
     {
-        // Validatsiya
         $request->validate([
             'body' => 'required|string|max:1000',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // 2MB gacha rasm
+            // image emas, images bo'ldi va array qabul qiladi (maksimum 6 ta)
+            'images' => 'nullable|array|max:6', 
+            // 2048 (2MB) o'rniga 10240 (10MB) qilib oshirildi
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:10240',
         ]);
 
-        $path = null;
-        if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('posts', 'public');
+        $paths = []; // Rasmlar yo'lini saqlash uchun bo'sh massiv
+
+        // Agar rasmlar yuklangan bo'lsa, har birini aylanib saqlaymiz
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $paths[] = $image->store('posts', 'public');
+            }
         }
 
-        // Bazaga yozish
         Post::create([
             'user_id' => Auth::id(),
             'body' => $request->body,
-            'image' => $path,
+            // Massivni JSON shaklida matn qilib bazaga yozamiz
+            'image' => !empty($paths) ? json_encode($paths) : null,
         ]);
 
-        return back()->with('status', 'Post created successfully!');
+        return back()->with('status', 'Post yaratildi!');
     }
 
-    // 2. Postni o'chirish (DELETE)
+    // 3. Postni o'chirish (DELETE) - BARCHA RASMLARNI XOTIRADAN O'CHIRISH
     public function destroy(Post $post)
     {
-        // Faqat o'zining postini o'chira olsin
         if (Auth::id() !== $post->user_id) {
             abort(403);
         }
 
-        // Agar rasm bo'lsa, uni ham o'chiramiz
         if ($post->image) {
-            Storage::disk('public')->delete($post->image);
+            // Rasmlarni JSON dan o'qiymiz
+            $images = json_decode($post->image, true);
+            
+            // Agar massiv bo'lsa, hammasini bittalab o'chiramiz
+            if (is_array($images)) {
+                foreach ($images as $img) {
+                    Storage::disk('public')->delete($img);
+                }
+            } else {
+                // Eski (bitta rasm formatida) saqlangan postlar bo'lsa
+                Storage::disk('public')->delete($post->image);
+            }
         }
 
         $post->delete();
 
-        return back()->with('status', 'Post deleted!');
+        return back()->with('status', 'Post o\'chirildi!');
     }
 
-    // ... class ichida
-
-    // Postni tahrirlash (UPDATE)
+    // 4. Postni tahrirlash (UPDATE) - YANGI RASMLAR UCHUN
     public function update(Request $request, Post $post)
     {
-        // 1. Faqat o'zining postini tahrirlay olsin
         if (Auth::id() !== $post->user_id) {
             abort(403);
         }
 
-        // 2. Validatsiya
         $request->validate([
             'body' => 'required|string|max:1000',
-            'image' => 'nullable|image|max:2048',
+            'images' => 'nullable|array|max:6',
+            // Bu yerda ham 2048 o'rniga 10240 (10MB) qilib oshirildi
+            'images.*' => 'image|max:10240',
         ]);
 
-        // 3. Rasmni yangilash (Agar yangi rasm yuklansa)
-        if ($request->hasFile('image')) {
-            // Eskisini o'chiramiz
+        // Agar yangi rasmlar yuklangan bo'lsa
+        if ($request->hasFile('images')) {
+            
+            // 1-qadam: Eski rasmlarni xotiradan tozalaymiz
             if ($post->image) {
-                Storage::disk('public')->delete($post->image);
+                $oldImages = json_decode($post->image, true);
+                if (is_array($oldImages)) {
+                    foreach ($oldImages as $oldImg) {
+                        Storage::disk('public')->delete($oldImg);
+                    }
+                } else {
+                    Storage::disk('public')->delete($post->image);
+                }
             }
-            // Yangisini saqlaymiz
-            $path = $request->file('image')->store('posts', 'public');
-            $post->image = $path;
+
+            // 2-qadam: Yangi rasmlarni yuklaymiz
+            $paths = [];
+            foreach ($request->file('images') as $image) {
+                $paths[] = $image->store('posts', 'public');
+            }
+            
+            $post->image = json_encode($paths);
         }
 
-        // 4. Matnni yangilash
         $post->body = $request->body;
         $post->save();
 
         return back()->with('status', 'Post yangilandi!');
     }
 
+    // 5. Ko'rishlar sonini oshirish (O'zgarmadi)
     public function incrementView(Request $request, Post $post)
-{
-    $ip = $request->ip();
-    $userId = Auth::id(); // Login qilgan user IDsi (yoki null)
+    {
+        $ip = $request->ip();
+        $userId = Auth::id();
 
-    // 1. Bazadan qidirishni boshlaymiz
-    $query = PostView::where('post_id', $post->id);
+        $query = PostView::where('post_id', $post->id);
 
-    if ($userId) {
-        // A) LOGIN QILGANLAR UCHUN:
-        // Faqat User ID ni tekshiramiz. IP bir xil bo'lsa ham farqi yo'q.
-        // Masalan: Asomiddin (ID: 1) va Bekzod (ID: 2) bitta Wi-Fi da bo'lsa ham, 
-        // ID lar har xil bo'lgani uchun ikkalasini ham sanaydi.
-        $query->where('user_id', $userId);
-    } else {
-        // B) MEHMONLAR UCHUN:
-        // Login qilmagan bo'lsa, IP bo'yicha tekshiramiz.
-        // Faqat oldin shu IP dan mehmon bo'lib kirganlarni tekshiramiz.
-        $query->where('ip_address', $ip)->whereNull('user_id');
-    }
+        if ($userId) {
+            $query->where('user_id', $userId);
+        } else {
+            $query->where('ip_address', $ip)->whereNull('user_id');
+        }
 
-    // Agar allaqachon ko'rgan bo'lsa (Bazada topilsa)
-    if ($query->exists()) {
-        return response()->json([
-            'views' => $post->views()->count()
+        if ($query->exists()) {
+            return response()->json(['views' => $post->views()->count()]);
+        }
+
+        PostView::create([
+            'post_id' => $post->id,
+            'user_id' => $userId,
+            'ip_address' => $ip,
+            'user_agent' => $request->header('User-Agent'),
         ]);
+
+        return response()->json(['views' => $post->views()->count()]);
     }
-
-    // 2. Agar ko'rmagan bo'lsa - YANGI YOZUV QO'SHAMIZ
-    PostView::create([
-        'post_id' => $post->id,
-        'user_id' => $userId,
-        'ip_address' => $ip,
-        'user_agent' => $request->header('User-Agent'),
-    ]);
-
-    return response()->json([
-        'views' => $post->views()->count()
-    ]);
-}
 }

@@ -8,14 +8,19 @@ use Illuminate\Notifications\Notification;
 class PostCommented extends Notification
 {
     use Queueable;
-    public $commenter;
-    public $comment; // YANGI
 
-    // Endi funksiya ikkita narsa qabul qiladi: Odam va Uning komenti
-    public function __construct($commenter, $comment)
+    public $commenter;
+    public $comment;
+    public $post; // 1. Postni saqlash uchun o'zgaruvchi
+
+    /**
+     * Konstruktor endi 3 ta argument qabul qiladi.
+     */
+    public function __construct($commenter, $comment, $post)
     {
         $this->commenter = $commenter;
-        $this->comment = $comment; 
+        $this->comment = $comment;
+        $this->post = $post; // 2. Postni biriktirish
     }
 
     public function via($notifiable)
@@ -23,6 +28,9 @@ class PostCommented extends Notification
         return ['database'];
     }
 
+    /**
+     * Bazaga saqlanadigan ma'lumotlar.
+     */
     public function toArray($notifiable)
     {
         return [
@@ -31,8 +39,12 @@ class PostCommented extends Notification
             'name' => $this->commenter->name,
             'username' => $this->commenter->username,
             'avatar' => $this->commenter->avatar,
-            'message' => 'sizning postingizga izoh qoldirdi:', // Biroz o'zgardi
-            'comment_text' => $this->comment->body, // YANGI: Komment matni
+            'message' => 'sizning postingizga izoh qoldirdi',
+            'comment_text' => $this->comment->body,
+            
+            // 3. RASM VA JAVOB UCHUN ENG MUHIM QISMLAR:
+            'post_id' => $this->post->id,       // ID bazaga yoziladi
+            'post_image' => $this->post->image, // Rasm yo'li bazaga yoziladi
         ];
     }
 }

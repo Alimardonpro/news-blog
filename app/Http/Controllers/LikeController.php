@@ -12,20 +12,16 @@ class LikeController extends Controller
     {
         $user = auth()->user();
         
-        // 1. Foydalanuvchi shu postga layk bosganmi, yo'qmi tekshiramiz
         $like = $post->likes()->where('user_id', $user->id)->first();
 
         if ($like) {
-            // 2. Agar oldin layk bosgan bo'lsa, laykni qaytarib olamiz (o'chiramiz)
             $like->delete();
         } else {
-            // 3. Agar bosmagan bo'lsa, yangi layk qo'shamiz
             $post->likes()->create(['user_id' => $user->id]);
 
-            // 4. Va aynan mana shu paytda (faqat layk BOSILGANDA) xabar yuboramiz
-            // O'ziga o'zi layk bossa, xabar bormaydi
             if ($post->user_id !== $user->id) {
-                $post->user->notify(new PostLiked($user));
+                // MANA SHU YERDA 2 TA NARSANI YUBORISh KERAK: KIM va NIMA
+                $post->user->notify(new PostLiked($user, $post));
             }
         }
 

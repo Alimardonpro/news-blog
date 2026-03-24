@@ -8,7 +8,8 @@ use App\Http\Controllers\ChatController;
 use App\Http\Controllers\FollowController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Post;
+use App\Models\Post;    
+
 
 // 1. ASOSIY SAHIFA
 Route::get('/', function () {
@@ -33,10 +34,20 @@ Route::middleware('auth')->group(function () {
     Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
     Route::post('/posts/{post}/like', [LikeController::class, 'toggle'])->name('posts.like');
     Route::post('/posts/{post}/view', [PostController::class, 'incrementView'])->name('posts.view');
+    Route::post('/posts/{post}/comments', [CommentController::class, 'store'])->name('comments.store');
+    Route::post('/posts/{post}/comments', [CommentController::class, 'store'])->name('comments.store');
+    Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
+    
 
     // IZOHLAR
     Route::post('/posts/{post}/comments', [CommentController::class, 'store'])->name('comments.store');
     Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
+    Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show'); // KO'RISH (Notification uchun)
+    Route::patch('/posts/{post}', [PostController::class, 'update'])->name('posts.update'); // TAHRIRLASH
+
+    Route::post('/posts/{post}/comments', [CommentController::class, 'store'])->name('comments.store');
+    Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
+
 
     Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
     Route::get('/chat/{user}/messages', [ChatController::class, 'getMessages'])->name('chat.messages');
