@@ -39,9 +39,13 @@ class ChatController extends Controller
 
         $startUser = null;
 
-        if ($request->has('user_id')) {
-            $startUser = User::find($request->get('user_id'));
+        // XATOLIK TUG'IRLANDI: Endi ham 'start_with', ham 'user_id' parametrini qabul qiladi
+        $requestedUserId = $request->get('user_id') ?? $request->get('start_with');
 
+        if ($requestedUserId) {
+            $startUser = User::find($requestedUserId);
+
+            // Agar u odam ro'yxatda yo'q bo'lsa, uni ro'yxat boshiga qo'shib qo'yamiz
             if ($startUser && !$users->contains('id', $startUser->id)) {
                 $startUser->unread_count = 0;
                 $users->prepend($startUser);

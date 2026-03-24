@@ -111,7 +111,7 @@
                                 </button>
                             </form>
 
-                            <a href="{{ route('chat.index', ['start_with' => $user->id]) }}"
+                            <a href="{{ route('chat.index', ['user_id' => $user->id]) }}"
                                class="py-3 px-8 rounded-2xl flex items-center justify-center bg-slate-50 border border-slate-200 text-slate-600 hover:bg-slate-100 hover:text-slate-900 active:scale-95 transition-all gap-2"
                                title="Xabar yozish">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -129,6 +129,13 @@
                 @forelse($posts as $post)
                     @php
                         $postData = $post->load('comments.user', 'user', 'likes');
+                        
+                        // JSON RASMLARNI O'QISH UCHUN QO'SHIMCHA MANTIQ
+                        $imgData = [];
+                        if($post->image) {
+                            $decoded = json_decode($post->image, true);
+                            $imgData = is_array($decoded) ? $decoded : [$post->image];
+                        }
                     @endphp
 
                     <div class="bg-white rounded-[2rem] border border-slate-100 p-5 hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300 flex flex-col group relative cursor-pointer"
@@ -173,9 +180,15 @@
                             </p>
                         @endif
 
-                        @if($post->image)
-                            <div class="rounded-[1.5rem] overflow-hidden border border-slate-100 mb-4 h-48">
-                                <img src="{{ asset('storage/' . $post->image) }}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
+                        @if(count($imgData) > 0)
+                            <div class="rounded-[1.5rem] overflow-hidden border border-slate-100 mb-4 h-48 relative">
+                                <img src="{{ asset('storage/' . $imgData[0]) }}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
+                                
+                                @if(count($imgData) > 1)
+                                    <div class="absolute top-3 right-3 bg-black/60 backdrop-blur-sm text-white p-1.5 rounded-lg shadow-sm">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                    </div>
+                                @endif
                             </div>
                         @endif
 
