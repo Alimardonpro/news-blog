@@ -28,18 +28,32 @@
                         <span class="text-[10px] font-black text-slate-300 uppercase tracking-tighter">{{ $post->created_at->diffForHumans() }}</span>
                     </div>
 
-                    <!-- Post Rasmi -->
+                    <!-- Post Kontenti (Rasm yoki Gradientli Matn) -->
                     @if($post->image)
-                        <div class="aspect-video bg-slate-50 overflow-hidden">
-                            <img src="{{ asset('storage/' . $post->image) }}" class="w-full h-full object-cover">
+                        @php
+                            $imgArr = json_decode($post->image, true);
+                            $firstImg = is_array($imgArr) ? ($imgArr[0] ?? null) : $post->image;
+                        @endphp
+                        @if($firstImg)
+                            <div class="aspect-video bg-slate-50 overflow-hidden">
+                                <img src="{{ asset('storage/' . $firstImg) }}" class="w-full h-full object-cover">
+                            </div>
+                        @endif
+                        <div class="p-7">
+                            <p class="text-slate-700 font-medium leading-relaxed mb-6 text-sm">
+                                {{ $post->body }}
+                            </p>
+                    @else
+                        <div class="p-8 relative overflow-hidden" style="background: {{ $post->gradient_style }};">
+                            <div class="absolute -right-4 -bottom-4 text-white/10 pointer-events-none select-none">
+                                <svg class="w-32 h-32" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
+                            </div>
+                            <p class="text-white text-lg sm:text-xl font-bold leading-relaxed relative z-10 drop-shadow-sm whitespace-pre-wrap">
+                                {{ $post->body }}
+                            </p>
                         </div>
+                        <div class="p-5 bg-white">
                     @endif
-
-                    <!-- Post Matni va Statistika -->
-                    <div class="p-7">
-                        <p class="text-slate-700 font-medium leading-relaxed mb-6 text-sm">
-                            {{ $post->body }}
-                        </p>
                         
                         <div class="flex items-center gap-6 text-slate-400">
                             <!-- Like -->

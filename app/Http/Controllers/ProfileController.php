@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Redirect;
 
 class ProfileController extends Controller
 {
@@ -62,11 +64,20 @@ class ProfileController extends Controller
         $user = Auth::user();
         $data = $request->validate([
             'name' => 'required|string|max:255',
-            'username' => 'required|string|max:255|unique:users,username,' . $user->id,
+            'username' => 'nullable|string|max:255|unique:users,username,' . $user->id,
+            'email' => 'nullable|string|lowercase|email|max:255|unique:users,email,' . $user->id,
             'bio' => 'nullable|string|max:1000',
             'avatar' => 'nullable|image|max:2048',
             'banner' => 'nullable|image|max:3072',
         ]);
+
+        if (empty($data['username'])) {
+            $data['username'] = $user->username;
+        }
+
+        if ($request->filled('email') && $user->email !== $request->email) {
+            $user->email_verified_at = null;
+        }
 
         if ($request->hasFile('avatar')) {
             if ($user->avatar) Storage::disk('public')->delete($user->avatar);
@@ -77,7 +88,34 @@ class ProfileController extends Controller
             $data['banner'] = $request->file('banner')->store('banners', 'public');
         }
 
-        $user->update($data);
-        return redirect()->route('profile.show', $user->username);
+        $user->fill($data);
+        $user->save();
+
+        if ($request->filled('redirect_to')) {
+            if ($user->wasChanged('username')) {
+                return redirect()->route('profile.show', $user->username)->with('status', 'profile-updated');
+            }
+            return redirect($request->input('redirect_to'))->with('status', 'profile-updated');
+        }
+
+        return redirect('/profile')->with('status', 'profile-updated');
+    }
+
+    public function destroy(Request $request): RedirectResponse
+    {
+        $request->validateWithBag('userDeletion', [
+            'password' => ['required', 'current_password'],
+        ]);
+
+        $user = $request->user();
+
+        Auth::logout();
+
+        $user->delete();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return Redirect::to('/');
     }
 }

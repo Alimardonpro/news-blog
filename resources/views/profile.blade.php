@@ -85,12 +85,12 @@
 
                     <div class="flex items-center gap-3 flex-wrap justify-center">
                         @if($isMyProfile)
-                            <button @click="openEditModal = true"
+                            <button @click.stop="openEditModal = true"
                                 class="bg-slate-900 text-white font-bold py-3 px-8 rounded-2xl hover:bg-slate-800 hover:shadow-lg hover:shadow-slate-900/20 active:scale-95 transition-all">
                                 Profilni tahrirlash
                             </button>
 
-                            <button @click="openSettingsModal = true"
+                            <button @click.stop="openSettingsModal = true"
                                 class="w-12 h-12 flex items-center justify-center bg-slate-50 border border-slate-200 text-slate-600 rounded-2xl hover:bg-slate-100 hover:text-slate-900 active:scale-95 transition-all">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -138,8 +138,7 @@
                         }
                     @endphp
 
-                    <div class="bg-white rounded-[2rem] border border-slate-100 p-5 hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300 flex flex-col group relative cursor-pointer"
-                         @click='showFullPost(@json($postData))'>
+                    <div class="bg-white rounded-[2rem] border border-slate-100 p-5 hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300 flex flex-col group relative">
 
                         @if(Auth::id() === $post->user_id)
                             <form action="{{ route('posts.destroy', $post) }}" method="POST"
@@ -174,13 +173,12 @@
                             </div>
                         </div>
 
-                        @if($post->body)
-                            <p class="text-slate-700 text-[15px] leading-relaxed mb-4 flex-1 break-words">
-                                {{ $post->body }}
-                            </p>
-                        @endif
-
                         @if(count($imgData) > 0)
+                            @if($post->body)
+                                <p class="text-slate-700 text-[15px] leading-relaxed mb-4 flex-1 break-words">
+                                    {{ $post->body }}
+                                </p>
+                            @endif
                             <div class="rounded-[1.5rem] overflow-hidden border border-slate-100 mb-4 h-48 relative">
                                 <img src="{{ asset('storage/' . $imgData[0]) }}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
                                 
@@ -189,6 +187,16 @@
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                                     </div>
                                 @endif
+                            </div>
+                        @else
+                            <div class="rounded-[1.5rem] overflow-hidden mb-4 h-48 p-6 relative flex flex-col justify-between group-hover:scale-[1.01] transition-all shadow-inner" style="background: {{ $post->gradient_style }};">
+                                <div class="text-white/20">
+                                    <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
+                                </div>
+                                <p class="text-white font-bold text-sm sm:text-base line-clamp-4 leading-relaxed drop-shadow-sm whitespace-pre-wrap">
+                                    {{ $post->body }}
+                                </p>
+                                <span class="text-[10px] font-bold text-white/60 uppercase tracking-widest">Matnli post</span>
                             </div>
                         @endif
 
@@ -231,13 +239,25 @@
         </div>
 
         @if($isMyProfile)
-            <div x-show="openEditModal"
-                 x-transition.opacity
-                 style="display: none;"
-                 class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm px-4">
+            <template x-teleport="body">
+                <div x-show="openEditModal"
+                     x-cloak
+                     style="display: none;"
+                     class="fixed inset-0 z-[120] flex items-center justify-center p-4 overflow-y-auto">
 
-                <div @click.away="openEditModal = false"
-                     class="bg-white w-full max-w-lg rounded-[2rem] shadow-2xl overflow-hidden relative">
+                    <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm"
+                         @click="openEditModal = false"
+                         x-transition.opacity></div>
+
+                    <form id="profileUpdateForm"
+                          method="POST"
+                          action="{{ route('profile.update') }}"
+                          enctype="multipart/form-data"
+                          class="bg-white w-full max-w-lg rounded-[2rem] shadow-2xl overflow-hidden relative z-10 my-auto"
+                          x-transition>
+                        @csrf
+                        @method('PATCH')
+                        <input type="hidden" name="redirect_to" value="{{ route('profile.show', $user->username) }}">
 
                     <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white/90 backdrop-blur sticky top-0 z-10">
                         <div class="flex items-center gap-4">
@@ -252,16 +272,13 @@
                             <h2 class="text-lg font-black text-slate-900">Profilni tahrirlash</h2>
                         </div>
 
-                        <button form="profileUpdateForm"
+                        <button type="submit"
                                 class="bg-slate-900 text-white text-sm font-bold px-6 py-2 rounded-xl hover:bg-slate-800 transition">
                             Saqlash
                         </button>
                     </div>
 
-                    <div class="p-6 max-h-[75vh] overflow-y-auto">
-                        <form id="profileUpdateForm" method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data" class="space-y-6">
-                            @csrf
-                            @method('PATCH')
+                    <div class="p-6 max-h-[75vh] overflow-y-auto space-y-6">
 
                             <div class="relative mb-12"
                                  x-data="{
@@ -393,18 +410,23 @@
                             @error('banner')
                                 <p class="text-sm text-red-500">{{ $message }}</p>
                             @enderror
-                        </form>
                     </div>
-                </div>
+                </form>
             </div>
+            </template>
 
-            <div x-show="openSettingsModal"
-                 x-transition.opacity
-                 style="display: none;"
-                 class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm px-4">
+            <template x-teleport="body">
+                <div x-show="openSettingsModal"
+                     x-cloak
+                     style="display: none;"
+                     class="fixed inset-0 z-[120] flex items-center justify-center p-4 overflow-y-auto">
 
-                <div @click.away="openSettingsModal = false"
-                     class="bg-white w-full max-w-2xl rounded-[2rem] shadow-2xl overflow-hidden relative">
+                    <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm"
+                         @click="openSettingsModal = false"
+                         x-transition.opacity></div>
+
+                    <div class="bg-white w-full max-w-2xl rounded-[2rem] shadow-2xl overflow-hidden relative z-10 my-auto"
+                         x-transition>
 
                     <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white/90 backdrop-blur sticky top-0 z-10">
                         <div class="flex items-center gap-4">
@@ -518,6 +540,7 @@
                     </div>
                 </div>
             </div>
+            </template>
         @endif
     </div>
 </x-app-layout>

@@ -16,4 +16,10 @@ class Comment extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    // Izoh tegishli bo'lgan post
+    public function post()
+    {
+        return $this->belongsTo(Post::class);
+    }
 }

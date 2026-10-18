@@ -784,10 +784,10 @@
                     @if(isset($startUser))
                         this.selectUser(
                             {{ $startUser->id }},
-                            `{!! addslashes($startUser->name) !!}`,
-                            `{!! $startUser->avatar !!}`,
+                            @js($startUser->name),
+                            @js($startUser->avatar),
                             0,
-                            `{!! $startUser->username !!}`
+                            @js($startUser->username)
                         );
                     @endif
                 },

@@ -12,6 +12,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->encryptCookies(except: [
+            'sidebar_collapsed',
+        ]);
         // Mana bu yerda $middleware->web() metodi chaqirilishi kerak
         $middleware->web(append: [
             \App\Http\Middleware\UserLastSeen::class,

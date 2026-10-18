@@ -21,6 +21,7 @@ class PostController extends Controller
     {
         $request->validate([
             'body' => 'required|string|max:1000',
+            'theme' => 'nullable|string|max:50',
             // image emas, images bo'ldi va array qabul qiladi (maksimum 6 ta)
             'images' => 'nullable|array|max:6', 
             // 2048 (2MB) o'rniga 10240 (10MB) qilib oshirildi
@@ -39,6 +40,7 @@ class PostController extends Controller
         Post::create([
             'user_id' => Auth::id(),
             'body' => $request->body,
+            'theme' => $request->theme,
             // Massivni JSON shaklida matn qilib bazaga yozamiz
             'image' => !empty($paths) ? json_encode($paths) : null,
         ]);
@@ -82,9 +84,9 @@ class PostController extends Controller
 
         $request->validate([
             'body' => 'required|string|max:1000',
+            'theme' => 'nullable|string|max:50',
             'images' => 'nullable|array|max:6',
-            // Bu yerda ham 2048 o'rniga 10240 (10MB) qilib oshirildi
-            'images.*' => 'image|max:10240',
+            'images.*' => 'image|mimes:jpeg,png,jpg,webp,gif|max:10240',
         ]);
 
         // Agar yangi rasmlar yuklangan bo'lsa
@@ -109,6 +111,10 @@ class PostController extends Controller
             }
             
             $post->image = json_encode($paths);
+        }
+
+        if ($request->has('theme')) {
+            $post->theme = $request->theme;
         }
 
         $post->body = $request->body;

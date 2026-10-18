@@ -16,7 +16,6 @@ class ChatController extends Controller
     public function index(Request $request)
     {
         $myId = Auth::id();
-        $hasIsRead = Schema::hasColumn('messages', 'is_read');
 
         $users = User::where('id', '!=', $myId)
             ->where(function ($query) use ($myId) {
@@ -26,26 +25,17 @@ class ChatController extends Controller
                     $q->where('sender_id', $myId);
                 });
             })
-            ->withCount(['sentMessages as unread_count' => function ($query) use ($myId, $hasIsRead) {
-                $query->where('receiver_id', $myId);
-
-                if ($hasIsRead) {
-                    $query->where('is_read', false);
-                } else {
-                    $query->whereNull('read_at');
-                }
+            ->withCount(['sentMessages as unread_count' => function ($query) use ($myId) {
+                $query->where('receiver_id', $myId)->where('is_read', false);
             }])
             ->get();
 
         $startUser = null;
-
-        // XATOLIK TUG'IRLANDI: Endi ham 'start_with', ham 'user_id' parametrini qabul qiladi
         $requestedUserId = $request->get('user_id') ?? $request->get('start_with');
 
         if ($requestedUserId) {
             $startUser = User::find($requestedUserId);
 
-            // Agar u odam ro'yxatda yo'q bo'lsa, uni ro'yxat boshiga qo'shib qo'yamiz
             if ($startUser && !$users->contains('id', $startUser->id)) {
                 $startUser->unread_count = 0;
                 $users->prepend($startUser);
@@ -59,31 +49,19 @@ class ChatController extends Controller
     public function getMessages(User $user)
     {
         $myId = Auth::id();
-        $hasIsRead = Schema::hasColumn('messages', 'is_read');
 
-        $unreadQuery = Message::where('sender_id', $user->id)
-            ->where('receiver_id', $myId);
+        $unreadIds = Message::where('sender_id', $user->id)
+            ->where('receiver_id', $myId)
+            ->where('is_read', false)
+            ->pluck('id');
 
-        if ($hasIsRead) {
-            $unreadQuery->where('is_read', false);
-        } else {
-            $unreadQuery->whereNull('read_at');
-        }
+        if ($unreadIds->isNotEmpty()) {
+            Message::whereIn('id', $unreadIds)->update(['is_read' => true]);
 
-        $unreadMessages = $unreadQuery->get();
-
-        if ($unreadMessages->count() > 0) {
-            foreach ($unreadMessages as $msg) {
-                if ($hasIsRead) {
-                    $msg->update(['is_read' => true]);
-                } else {
-                    $msg->update(['read_at' => now()]);
-                }
-
-                // Xabar yuborgan odamga: "sening xabaring o'qildi" deb signal yuboriladi
+            foreach ($unreadIds as $id) {
                 broadcast(new MessageRead(
-                    $msg->id,
-                    $msg->sender_id,
+                    $id,
+                    $user->id,
                     $myId
                 ))->toOthers();
             }
@@ -103,8 +81,8 @@ class ChatController extends Controller
     {
         $request->validate([
             'message' => 'nullable|string|max:2000',
-            'image'   => 'nullable|image|max:5120',
-            'audio'   => 'nullable|file|max:10240',
+            'image'   => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:5120',
+            'audio'   => 'nullable|file|mimes:mp3,wav,ogg,m4a,aac,webm|max:10240',
             'video'   => 'nullable|file|mimes:mp4,mov,ogg,qt,webm|max:51200',
         ]);
 
@@ -119,13 +97,8 @@ class ChatController extends Controller
             'image'       => $request->hasFile('image') ? $request->file('image')->store('chat_images', 'public') : null,
             'audio'       => $request->hasFile('audio') ? $request->file('audio')->store('chat_audios', 'public') : null,
             'video'       => $request->hasFile('video') ? $request->file('video')->store('chat_videos', 'public') : null,
+            'is_read'     => false,
         ];
-
-        if (Schema::hasColumn('messages', 'is_read')) {
-            $data['is_read'] = false;
-        } elseif (Schema::hasColumn('messages', 'read_at')) {
-            $data['read_at'] = null;
-        }
 
         $message = Message::create($data);
 
@@ -137,16 +110,11 @@ class ChatController extends Controller
     // 4. Umumiy o'qilmaganlar soni
     public function getTotalUnread()
     {
-        $query = Message::where('receiver_id', Auth::id());
+        $count = Message::where('receiver_id', Auth::id())
+            ->where('is_read', false)
+            ->count();
 
-        if (Schema::hasColumn('messages', 'is_read')) {
-            $query->where('is_read', false);
-        } else {
-            $query->whereNull('read_at');
-        }
-
-        $count = $query->count();
-        $notifCount = Auth::user()->unreadNotifications->count();
+        $notifCount = Auth::user()->unreadNotifications()->count();
 
         return response()->json([
             'count' => $count,

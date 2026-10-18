@@ -21,9 +21,6 @@ class Message extends Model
         'read_at'
     ];
 
-    // YANGI: Chatga fayl hajmini jo'natamiz
-    protected $appends = ['media_size'];
-
     public function getMediaSizeAttribute()
     {
         // Rasm, video yoki audio bormi tekshiramiz

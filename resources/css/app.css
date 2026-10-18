@@ -3,8 +3,9 @@
 @tailwind utilities;
 
 
-*{
-  font-family: "Space Grotesk", sans-serif;
-  font-optical-sizing: auto;
-  font-weight: 400;
+@layer base {
+  html, body {
+    font-family: "Space Grotesk", sans-serif;
+    font-optical-sizing: auto;
+  }
 }
