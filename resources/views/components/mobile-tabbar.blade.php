@@ -7,7 +7,7 @@
 
 <!-- FIXED MOBILE BOTTOM TAB BAR -->
 <nav id="mobile-bottom-tabbar" 
-     class="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white/90 backdrop-blur-xl border-t border-gray-200/80 shadow-[0_-8px_30px_rgba(0,0,0,0.06)] transition-transform duration-300">
+     class="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-xl border-t border-gray-200/80 shadow-[0_-8px_30px_rgba(0,0,0,0.06)] select-none">
     <div class="max-w-md mx-auto px-4 h-16 flex items-center justify-between pb-[env(safe-area-inset-bottom,0px)]">
         
         <!-- 1. Asosiy panel (Feed / Dashboard) -->

@@ -15,6 +15,10 @@
     </script>
     <style>
         html { scrollbar-gutter: stable; }
+        html, body {
+            overscroll-behavior-y: none;
+            -webkit-overflow-scrolling: touch;
+        }
         [x-cloak] { display: none !important; }
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }

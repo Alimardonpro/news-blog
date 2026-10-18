@@ -27,9 +27,9 @@
             window.history.replaceState({}, document.title, cleanUrl);
         }
     "
-    class="h-[100dvh] lg:h-screen flex flex-col bg-[#F8FAFC] font-sans overflow-hidden"> 
+    class="h-[100dvh] lg:h-screen flex flex-col bg-[#F8FAFC] font-sans overflow-hidden overscroll-none"> 
 
-        <header class="flex h-[60px] sm:h-[70px] shrink-0 items-center justify-between px-4 sm:px-6 lg:px-10 border-b border-gray-200 bg-white/95 backdrop-blur-md z-40 relative shadow-sm">
+        <header class="sticky top-0 inset-x-0 flex h-[60px] sm:h-[70px] shrink-0 items-center justify-between px-4 sm:px-6 lg:px-10 border-b border-gray-200 bg-white/95 backdrop-blur-md z-40 shadow-sm select-none">
             <h2 class="text-lg sm:text-xl font-black text-gray-900 tracking-tight">Postlar Lentasi</h2>
             
             <div class="flex items-center gap-2 sm:gap-3">
@@ -47,7 +47,7 @@
             </div>
         </header>
 
-        <div class="flex-1 overflow-y-auto snap-y snap-mandatory no-scrollbar relative w-full">
+        <div class="flex-1 overflow-y-auto snap-y snap-mandatory no-scrollbar relative w-full overscroll-contain">
             
             @if($posts->isEmpty())
                 <div class="flex items-center justify-center h-full">
