@@ -123,6 +123,7 @@
 }" class="font-sans antialiased bg-[#f8f9fa] overflow-x-hidden"> <!-- Fon biroz ochartirildi, kontrast yaxshilanishi uchun -->
     
     <x-sidebar />
+    <x-mobile-tabbar />
 
     <main id="app-main" 
           class="min-h-screen flex flex-col relative">

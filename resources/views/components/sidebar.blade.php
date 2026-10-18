@@ -171,8 +171,10 @@
             if (path.includes('/chat')) {
                 const badge = document.getElementById('global-unread-count');
                 const badgeMini = document.getElementById('global-unread-count-mini');
+                const mobileChatBadge = document.getElementById('mobile-chat-unread');
                 if (badge) badge.style.display = 'none';
                 if (badgeMini) badgeMini.style.display = 'none';
+                if (mobileChatBadge) mobileChatBadge.style.display = 'none';
             }
 
             fetch('/chat/total-unread')
@@ -180,9 +182,11 @@
                 .then(data => {
                     const badge = document.getElementById('global-unread-count');
                     const badgeMini = document.getElementById('global-unread-count-mini');
+                    const mobileChatBadge = document.getElementById('mobile-chat-unread');
                     const notifBadge = document.getElementById('notif-unread-count');
                     const notifBadgeMini = document.getElementById('notif-unread-count-mini');
                     const dot = document.getElementById('profile-unread-dot');
+                    const mobileDot = document.getElementById('mobile-profile-unread-dot');
 
                     if (!path.includes('/chat')) {
                         if (badge) {
@@ -194,6 +198,10 @@
                             badgeMini.innerText = data.count > 9 ? '9+' : data.count;
                             badgeMini.style.display = data.count > 0 ? 'flex' : 'none';
                         }
+                        if (mobileChatBadge) {
+                            mobileChatBadge.innerText = data.count > 9 ? '9+' : data.count;
+                            mobileChatBadge.style.display = data.count > 0 ? 'flex' : 'none';
+                        }
                     }
                     if (notifBadge) {
                         notifBadge.innerText = data.notif_count;
@@ -203,8 +211,12 @@
                         notifBadgeMini.innerText = data.notif_count > 9 ? '9+' : data.notif_count;
                         notifBadgeMini.style.display = data.notif_count > 0 ? 'flex' : 'none';
                     }
+                    const hasUnread = (data.count + data.notif_count) > 0;
                     if (dot) {
-                        dot.style.display = (data.count + data.notif_count) > 0 ? 'block' : 'none';
+                        dot.style.display = hasUnread ? 'block' : 'none';
+                    }
+                    if (mobileDot) {
+                        mobileDot.style.display = hasUnread ? 'block' : 'none';
                     }
                 }).catch(() => {});
         }

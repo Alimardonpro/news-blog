@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div class="max-w-2xl mx-auto px-4 py-12 bg-[#f8fafc] min-h-screen">
+    <div class="max-w-2xl mx-auto px-4 py-6 pb-24 sm:py-12 lg:pb-12 bg-[#f8fafc] min-h-screen">
         <div class="flex items-center justify-between mb-8">
             <h2 class="text-2xl font-black text-slate-900 uppercase tracking-tighter">Siz kuzatayotganlar</h2>
             <a href="{{ route('dashboard') }}" class="text-xs font-bold text-indigo-600 hover:underline">Barcha postlar →</a>

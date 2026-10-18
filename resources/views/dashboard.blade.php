@@ -17,22 +17,32 @@
             { key: 'cyber', name: 'Cyber', bg: 'linear-gradient(135deg, #4c1d95, #6d28d9, #1e1b4b)' },
             { key: 'midnight', name: 'Midnight', bg: 'linear-gradient(135deg, #0f172a, #1e293b, #020617)' }
         ]
-    }" class="h-screen flex flex-col bg-[#F8FAFC] font-sans overflow-hidden"> 
+    }"
+    @open-create-post.window="openPostModal = true"
+    x-init="
+        if (new URLSearchParams(window.location.search).get('create') === '1') {
+            openPostModal = true;
+            // Clean URL param without page reload
+            const cleanUrl = window.location.origin + window.location.pathname;
+            window.history.replaceState({}, document.title, cleanUrl);
+        }
+    "
+    class="h-[100dvh] lg:h-screen flex flex-col bg-[#F8FAFC] font-sans overflow-hidden"> 
 
-        <header class="flex h-[70px] shrink-0 items-center justify-between px-6 lg:px-10 border-b border-gray-200 bg-white/95 backdrop-blur-md z-40 relative shadow-sm">
-            <h2 class="text-xl font-black text-gray-900 tracking-tight">Postlar Lentasi</h2>
+        <header class="flex h-[60px] sm:h-[70px] shrink-0 items-center justify-between px-4 sm:px-6 lg:px-10 border-b border-gray-200 bg-white/95 backdrop-blur-md z-40 relative shadow-sm">
+            <h2 class="text-lg sm:text-xl font-black text-gray-900 tracking-tight">Postlar Lentasi</h2>
             
-            <div class="flex items-center gap-3">
-                <button @click="openNotifications = true" class="relative p-2.5 text-gray-700 hover:bg-gray-100 rounded-full transition group">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="flex items-center gap-2 sm:gap-3">
+                <button @click="openNotifications = true" class="relative p-2 sm:p-2.5 text-gray-700 hover:bg-gray-100 rounded-full transition group" title="Bildirishnomalar">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
                     </svg>
-                    <span class="absolute top-2 right-2.5 w-2.5 h-2.5 bg-red-500 border-2 border-white rounded-full"></span>
+                    <span class="absolute top-1.5 sm:top-2 right-2 sm:right-2.5 w-2 sm:w-2.5 h-2 sm:h-2.5 bg-red-500 border-2 border-white rounded-full"></span>
                 </button>
 
-                <button @click.stop="openPostModal = true" class="bg-black hover:bg-gray-800 text-white text-sm font-bold px-6 py-2.5 rounded-full transition shadow-lg flex items-center gap-2 hover:-translate-y-0.5">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                    Yangi Post  
+                <button @click.stop="openPostModal = true" class="bg-black hover:bg-gray-800 text-white text-xs sm:text-sm font-bold px-3.5 sm:px-6 py-2 sm:py-2.5 rounded-full transition shadow-lg flex items-center gap-1.5 sm:gap-2 hover:-translate-y-0.5">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    <span>Yangi Post</span>
                 </button>
             </div>
         </header>
@@ -93,9 +103,9 @@
                         }, { threshold: 0.1 });
                         observer.observe($el);
                      "
-                     class="w-full h-[calc(100vh-70px)] snap-start flex items-center justify-center relative py-8">
+                     class="w-full h-[calc(100dvh-60px-64px)] sm:h-[calc(100dvh-70px-64px)] lg:h-[calc(100vh-70px)] snap-start flex items-center justify-center relative py-2 sm:py-6 lg:py-8">
                     
-                    <div x-ref="slider" @scroll.debounce.10ms="updateActiveSlide" class="w-full h-full flex overflow-x-auto snap-x snap-mandatory no-scrollbar items-center gap-8 px-[5vw] md:px-[calc(50vw-325px)]">
+                    <div x-ref="slider" @scroll.debounce.10ms="updateActiveSlide" class="w-full h-full flex overflow-x-auto snap-x snap-mandatory no-scrollbar items-center gap-4 sm:gap-8 px-[4vw] sm:px-[5vw] md:px-[calc(50vw-325px)]">
                         
                         @foreach($horizontalPosts as $index => $p)
                             @php
@@ -115,7 +125,7 @@
                                             : 'text-base sm:text-lg font-medium text-left'));
                             @endphp
 
-                            <div class="shrink-0 w-[90vw] md:w-[650px] h-full snap-center transition-all duration-500 ease-out"
+                            <div class="shrink-0 w-[92vw] sm:w-[90vw] md:w-[650px] h-full snap-center transition-all duration-500 ease-out"
                                  :class="activeSlide === {{ $index }} ? 'scale-100 opacity-100 z-20 pointer-events-auto' : 'scale-[0.85] opacity-40 blur-[2px] z-10 pointer-events-none'">
                                  
                                 <div x-data="{ 
@@ -170,12 +180,12 @@
                                             }
                                         }
                                      }"
-                                     class="w-full h-full rounded-[2.5rem] shadow-2xl relative overflow-hidden group"
+                                     class="w-full h-full rounded-[1.8rem] sm:rounded-[2.5rem] shadow-2xl relative overflow-hidden group"
                                      style="background: {{ count($imgData) === 0 ? $p->gradient_style : '#111' }};">
                                         
                                         @if($horizontalPosts->count() > 1)
                                             <!-- Story-like Horizontal Progress Segments -->
-                                            <div class="absolute top-3 left-6 right-6 z-40 flex items-center gap-1.5 pointer-events-auto">
+                                            <div class="absolute top-3 left-4 sm:left-6 right-4 sm:right-6 z-40 flex items-center gap-1.5 pointer-events-auto">
                                                 @for($seg = 0; $seg < $horizontalPosts->count(); $seg++)
                                                     <button type="button" 
                                                             @click.stop="goToSlide({{ $seg }})"
@@ -188,7 +198,7 @@
                                             </div>
 
                                             <!-- Top Floating Author Collection Pill / Back Button -->
-                                            <div class="absolute top-6 left-6 z-40 flex items-center gap-2">
+                                            <div class="absolute top-6 left-4 sm:left-6 z-40 flex items-center gap-2">
                                                 @if($index === 0)
                                                     <button type="button" 
                                                             @click.stop="goToSlide(1)"
@@ -259,7 +269,7 @@
                                         @endif
 
                                         @if(Auth::id() === $p->user_id)
-                                            <div class="absolute top-6 right-6 z-40 flex gap-2">
+                                            <div class="absolute top-6 right-4 sm:right-6 z-40 flex gap-2">
                                                 <button type="button" 
                                                     @click.stop="
                                                         editingPost = { id: {{ $p->id }}, body: @js($p->body), images: imgs, theme: @js($p->theme ?? 'cosmic') };

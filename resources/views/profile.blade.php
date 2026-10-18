@@ -11,7 +11,7 @@
             $errors->has('banner');
     @endphp
 
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10"
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24 sm:py-10 lg:pb-10"
          x-data="{
             openEditModal: {{ $isMyProfile && $hasProfileErrors ? 'true' : 'false' }},
             openSettingsModal: {{ $isMyProfile && ($errors->updatePassword->any() || $errors->userDeletion->any()) ? 'true' : 'false' }},
@@ -22,7 +22,7 @@
 
             <div class="bg-white rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 overflow-hidden mb-8">
 
-                <div class="h-48 sm:h-64 w-full bg-slate-100 relative group">
+                <div class="h-36 sm:h-64 w-full bg-slate-100 relative group">
                     @if($user->banner)
                         <img src="{{ asset('storage/' . $user->banner) }}" class="w-full h-full object-cover">
                     @else
@@ -30,9 +30,9 @@
                     @endif
                 </div>
 
-                <div class="px-6 pb-10 flex flex-col items-center text-center relative z-10 -mt-16 sm:-mt-20">
+                <div class="px-4 sm:px-6 pb-8 sm:pb-10 flex flex-col items-center text-center relative z-10 -mt-14 sm:-mt-20">
 
-                    <div class="w-32 h-32 sm:w-40 sm:h-40 bg-white rounded-[2rem] p-1.5 shadow-xl shadow-slate-200/50 mb-4 transform rotate-3 hover:rotate-0 transition-transform duration-300">
+                    <div class="w-28 h-28 sm:w-40 sm:h-40 bg-white rounded-[1.8rem] sm:rounded-[2rem] p-1.5 shadow-xl shadow-slate-200/50 mb-4 transform rotate-2 sm:rotate-3 hover:rotate-0 transition-transform duration-300">
                         @if($user->avatar)
                             <img src="{{ asset('storage/' . $user->avatar) }}" class="w-full h-full rounded-[1.5rem] object-cover">
                         @else
@@ -54,7 +54,7 @@
                         {{ $user->bio ?? "Bu yerda sizning bio ma'lumotlaringiz turadi. O'zingiz haqingizda qisqacha yozib qoldiring." }}
                     </p>
 
-                    <div class="flex items-center gap-6 sm:gap-12 bg-slate-50 border border-slate-100 px-8 py-4 rounded-3xl mb-8">
+                    <div class="flex items-center justify-around w-full max-w-sm sm:max-w-none sm:w-auto sm:justify-center gap-3 sm:gap-12 bg-slate-50 border border-slate-100 px-4 sm:px-8 py-3.5 sm:py-4 rounded-3xl mb-8">
                         <div class="text-center">
                             <span class="block text-2xl font-black text-slate-900">{{ $posts->count() }}</span>
                             <span class="text-xs font-bold text-slate-400 uppercase tracking-wider mt-1">Postlar</span>

@@ -62,7 +62,7 @@
                     </div>
                 </div>
 
-                <div class="flex-1 overflow-y-auto p-2 lg:p-3 space-y-1 custom-scrollbar bg-white lg:bg-slate-50/30">
+                <div class="flex-1 overflow-y-auto p-2 pb-24 lg:p-3 lg:pb-3 space-y-1 custom-scrollbar bg-white lg:bg-slate-50/30">
                     <template x-for="u in filteredLocalUsers()" :key="'local-'+u.id">
                         <div @click="selectUser(u.id, u.name, u.avatar || null, u.unread_count || 0, u.username || '')"
                              :class="selectedUserId === u.id ? 'bg-slate-900 shadow-lg shadow-slate-900/10' : 'hover:bg-slate-50 border border-transparent hover:border-slate-200'"
@@ -790,6 +790,17 @@
                             @js($startUser->username)
                         );
                     @endif
+
+                    this.$watch("showChat", (value) => {
+                        const tabbar = document.getElementById("mobile-bottom-tabbar");
+                        if (tabbar) {
+                            tabbar.style.display = value ? "none" : "";
+                        }
+                    });
+                    const tabbar = document.getElementById("mobile-bottom-tabbar");
+                    if (tabbar && this.showChat) {
+                        tabbar.style.display = "none";
+                    }
                 },
 
                 filteredLocalUsers() {
@@ -885,6 +896,8 @@
 
                 closeChat() {
                     this.showChat = false;
+                    const tabbar = document.getElementById("mobile-bottom-tabbar");
+                    if (tabbar) tabbar.style.display = "";
                     this.selectedUserId = null;
                     this.selectedUserName = '';
                     this.selectedUserAvatar = '';

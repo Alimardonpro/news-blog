@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div class="min-h-screen bg-[#f9fafb]">
+    <div class="min-h-screen bg-[#f9fafb] pb-24 lg:pb-12">
         
         <div class="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200 shadow-sm">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
@@ -46,7 +46,7 @@
             </div>
         </div>
 
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
             
             <div class="relative mb-8 w-full mx-auto">
                 <div class="absolute inset-y-0 left-5 flex items-center pointer-events-none">
@@ -59,10 +59,10 @@
             <div class="w-full mx-auto bg-white rounded-[2rem] border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
                 <div class="divide-y divide-slate-50">
                     @forelse($users as $u)
-                        <div class="p-6 sm:px-8 flex items-center justify-between hover:bg-slate-50 transition-all group cursor-default">
-                            <a href="{{ route('profile.show', $u->username) }}" class="flex items-center gap-6 flex-1 hover:no-underline">
+                        <div class="p-4 sm:p-6 sm:px-8 flex items-center justify-between hover:bg-slate-50 transition-all group cursor-default">
+                            <a href="{{ route('profile.show', $u->username) }}" class="flex items-center gap-3.5 sm:gap-6 flex-1 hover:no-underline">
                                 
-                                <div class="relative w-16 h-16 sm:w-20 sm:h-20 rounded-[1.5rem] bg-white p-1 shadow-md overflow-hidden transform group-hover:rotate-3 transition-transform shrink-0">
+                                <div class="relative w-12 h-12 sm:w-20 sm:h-20 rounded-[1.2rem] sm:rounded-[1.5rem] bg-white p-1 shadow-md overflow-hidden transform group-hover:rotate-3 transition-transform shrink-0">
                                     @if($u->avatar)
                                         <img src="{{ asset('storage/' . $u->avatar) }}" class="w-full h-full rounded-xl object-cover">
                                     @else

@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div x-data="{ tab: 'all' }" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 bg-[#f9fafb] min-h-screen">
+    <div x-data="{ tab: 'all' }" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24 sm:py-12 lg:pb-12 bg-[#f9fafb] min-h-screen">
         <div class="grid grid-cols-12 gap-8">
 
             <div class="col-span-12 lg:col-span-8 space-y-8">
@@ -20,13 +20,13 @@
                         <div x-data="{ showReply: false }"
                              x-show="tab === 'all'" 
                              x-transition:enter="transition ease-out duration-500"
-                             class="group p-8 rounded-[3rem] shadow-[0_10px_40px_rgba(0,0,0,0.02)] hover:shadow-[0_30px_60px_rgba(0,0,0,0.06)] hover:-translate-y-1.5 transition-all duration-500 
+                             class="group p-4 sm:p-8 rounded-[2rem] sm:rounded-[3rem] shadow-[0_10px_40px_rgba(0,0,0,0.02)] hover:shadow-[0_30px_60px_rgba(0,0,0,0.06)] hover:-translate-y-1.5 transition-all duration-500 
                              {{ $notification->read_at ? 'bg-white border border-slate-200' : 'bg-blue-50/60 border border-blue-200 shadow-blue-500/5' }}">
                             
-                            <div class="flex items-start gap-6">
+                            <div class="flex items-start gap-3.5 sm:gap-6">
                                 
                                 <div class="relative shrink-0">
-                                    <img src="{{ isset($notification->data['avatar']) ? asset('storage/'.$notification->data['avatar']) : 'https://ui-avatars.com/api/?name='.urlencode($notification->data['name'] ?? 'U').'&background=0088cc&color=fff' }}" class="w-16 h-16 sm:w-20 sm:h-20 rounded-[2rem] shadow-xl ring-4 ring-slate-50 object-cover">
+                                    <img src="{{ isset($notification->data['avatar']) ? asset('storage/'.$notification->data['avatar']) : 'https://ui-avatars.com/api/?name='.urlencode($notification->data['name'] ?? 'U').'&background=0088cc&color=fff' }}" class="w-12 h-12 sm:w-20 sm:h-20 rounded-[1.2rem] sm:rounded-[2rem] shadow-xl ring-4 ring-slate-50 object-cover">
                                     
                                     <div class="absolute -bottom-2 -right-2 p-1.5 rounded-full border-[4px] border-white text-white 
                                         @if(($notification->data['type'] ?? '') === 'like') bg-red-500 

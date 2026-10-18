@@ -9,13 +9,13 @@
                 return list.filter(i => i.name.toLowerCase().includes(this.search.toLowerCase()) || i.username.toLowerCase().includes(this.search.toLowerCase()));
             }
          }" 
-         class="min-h-screen bg-[#F0F2F5] pb-10">
+         class="min-h-screen bg-[#F0F2F5] pb-24 lg:pb-10">
         
-        <div class="max-w-[1150px] mx-auto px-6 py-10">
+        <div class="max-w-[1150px] mx-auto px-4 sm:px-6 py-6 sm:py-10">
             
             <div class="space-y-6">
                 
-                <div class="bg-white p-6 md:p-8 rounded-[2.5rem] shadow-sm border border-slate-100">
+                <div class="bg-white p-4 sm:p-6 md:p-8 rounded-[1.8rem] sm:rounded-[2.5rem] shadow-sm border border-slate-100">
                     <div class="flex flex-col md:flex-row items-center justify-between gap-6 mb-6">
                         <div class="flex items-center gap-5 w-full md:w-auto">
                             <a href="{{ route('profile.show', $user->username) }}" class="w-12 h-12 shrink-0 bg-[#000000] text-white rounded-[1.2rem] flex items-center justify-center hover:scale-105 transition-transform shadow-md">
@@ -52,9 +52,9 @@
 
                 <div class="space-y-4">
                     <template x-for="f in filteredList" :key="f.id">
-                        <div class="bg-white p-5 md:px-8 md:py-6 rounded-[2rem] shadow-sm flex items-center justify-between group hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 border border-transparent hover:border-[#4F46E5]/10">
-                            <a :href="f.url" class="flex items-center gap-6 w-full max-w-[70%]">
-                                <div class="relative w-16 h-16 shrink-0 group-hover:scale-105 transition-transform duration-300">
+                        <div class="bg-white p-4 sm:p-5 md:px-8 md:py-6 rounded-[1.5rem] sm:rounded-[2rem] shadow-sm flex items-center justify-between group hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 border border-transparent hover:border-[#4F46E5]/10">
+                            <a :href="f.url" class="flex items-center gap-3 sm:gap-6 w-full max-w-[65%] sm:max-w-[70%]">
+                                <div class="relative w-12 h-12 sm:w-16 sm:h-16 shrink-0 group-hover:scale-105 transition-transform duration-300">
                                     <template x-if="f.avatar">
                                         <img :src="f.avatar" class="w-full h-full rounded-[1.2rem] object-cover shadow-sm border border-slate-100">
                                     </template>
