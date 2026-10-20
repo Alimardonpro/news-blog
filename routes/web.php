@@ -18,7 +18,7 @@ Route::get('/', function () {
 
 // 2. DASHBOARD
 Route::get('/dashboard', function () {
-    $posts = Post::with(['user', 'comments.user'])
+    $posts = Post::with(['user.posts', 'comments.user'])
         ->withCount(['likes', 'comments', 'views'])
         ->withExists(['likes as is_liked_by_me' => function ($q) {
             $q->where('user_id', Auth::id());

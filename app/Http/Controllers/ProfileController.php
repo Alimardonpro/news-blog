@@ -20,6 +20,7 @@ class ProfileController extends Controller
             ->firstOrFail();
 
         $posts = $user->posts()
+            ->with(['comments.user', 'user', 'likes'])
             ->withCount(['likes', 'comments', 'views'])
             ->get();
 

@@ -72,20 +72,16 @@
                         showHints: true,
                         updateActiveSlide() {
                             let container = this.$refs.slider;
-                            if(!container || !container.children[0]) return;
-                            let slideWidth = container.children[0].offsetWidth;
-                            let gap = parseFloat(window.getComputedStyle(container).gap) || 0;
-                            this.activeSlide = Math.round(container.scrollLeft / (slideWidth + gap));
+                            if(!container || container.clientWidth === 0) return;
+                            this.activeSlide = Math.round(container.scrollLeft / container.clientWidth);
                             if (this.activeSlide > 0) {
                                 this.showHints = false;
                             }
                         },
                         goToSlide(index) {
                             let container = this.$refs.slider;
-                            if(!container || !container.children[0]) return;
-                            let slideWidth = container.children[0].offsetWidth;
-                            let gap = parseFloat(window.getComputedStyle(container).gap) || 0;
-                            container.scrollTo({ left: index * (slideWidth + gap), behavior: 'smooth' });
+                            if(!container) return;
+                            container.scrollTo({ left: index * container.clientWidth, behavior: 'smooth' });
                             this.activeSlide = index;
                             if (index > 0) {
                                 this.showHints = false;
@@ -96,7 +92,9 @@
                         setTimeout(() => { showHints = false; }, 6000);
                         let observer = new IntersectionObserver((entries) => {
                             if(!entries[0].isIntersecting) {
-                                $refs.slider.scrollLeft = 0;
+                                if ($refs.slider) {
+                                    $refs.slider.scrollLeft = 0;
+                                }
                                 activeSlide = 0;
                                 showHints = true;
                             }
@@ -105,7 +103,9 @@
                      "
                      class="w-full h-[calc(100dvh-60px-64px)] sm:h-[calc(100dvh-70px-64px)] lg:h-[calc(100vh-70px)] snap-start flex items-center justify-center relative py-2 sm:py-6 lg:py-8">
                     
-                    <div x-ref="slider" @scroll.debounce.10ms="updateActiveSlide" class="w-full h-full flex overflow-x-auto snap-x snap-mandatory no-scrollbar items-center gap-4 sm:gap-8 px-[4vw] sm:px-[5vw] md:px-[calc(50vw-325px)]">
+                    <div x-ref="slider" 
+                         @scroll.debounce.10ms="updateActiveSlide" 
+                         class="w-full h-full flex overflow-x-auto snap-x snap-mandatory no-scrollbar items-center">
                         
                         @foreach($horizontalPosts as $index => $p)
                             @php
@@ -125,8 +125,9 @@
                                             : 'text-base sm:text-lg font-medium text-left'));
                             @endphp
 
-                            <div class="shrink-0 w-[92vw] sm:w-[90vw] md:w-[650px] h-full snap-center transition-all duration-500 ease-out"
-                                 :class="activeSlide === {{ $index }} ? 'scale-100 opacity-100 z-20 pointer-events-auto' : 'scale-[0.85] opacity-40 blur-[2px] z-10 pointer-events-none'">
+                            <div class="w-full h-full shrink-0 flex items-center justify-center snap-center p-2 sm:p-4">
+                                <div class="w-[92vw] sm:w-[90vw] md:w-[650px] h-full transition-all duration-500 ease-out"
+                                     :class="activeSlide === {{ $index }} ? 'scale-100 opacity-100 z-20 pointer-events-auto' : 'scale-[0.85] opacity-40 blur-[2px] z-10 pointer-events-none'">
                                  
                                 <div x-data="{ 
                                         openComments: false,
@@ -430,8 +431,9 @@
                                     </template>
                                 </div>
                             </div>
-                        @endforeach
-                    </div>
+                        </div>
+                    @endforeach
+                </div>
 
                     <!-- Floating 2D Navigation Cues (Disappears after 6s or when scrolled) -->
                     @if($horizontalPosts->count() > 1)
@@ -710,7 +712,6 @@
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        .snap-mandatory { scroll-snap-type: both mandatory; }
         @keyframes slideUp { 0% { opacity: 0; transform: translateY(10px); } 100% { opacity: 1; transform: translateY(0); } }
         .slide-up-animation { animation: slideUp 0.3s ease-out forwards; }
         @keyframes zoomIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }

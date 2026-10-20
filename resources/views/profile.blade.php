@@ -128,8 +128,6 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @forelse($posts as $post)
                     @php
-                        $postData = $post->load('comments.user', 'user', 'likes');
-                        
                         // JSON RASMLARNI O'QISH UCHUN QO'SHIMCHA MANTIQ
                         $imgData = [];
                         if($post->image) {
