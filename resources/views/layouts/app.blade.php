@@ -4,11 +4,20 @@
     <script>
         (function() {
             try {
-                var stored = localStorage.getItem('sidebar_collapsed');
-                if (stored === 'true') {
+                // Sidebar state
+                var storedSidebar = localStorage.getItem('sidebar_collapsed');
+                if (storedSidebar === 'true') {
                     document.documentElement.classList.add('sidebar-collapsed');
-                } else if (stored === 'false') {
+                } else if (storedSidebar === 'false') {
                     document.documentElement.classList.remove('sidebar-collapsed');
+                }
+
+                // Dark mode state
+                var theme = localStorage.getItem('theme');
+                if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
                 }
             } catch(e) {}
         })();
@@ -21,7 +30,8 @@
         }
         [x-cloak] { display: none !important; }
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; }
         
         :root {
             --sidebar-width: 16rem;
@@ -47,9 +57,6 @@
         html.sidebar-collapsed .sidebar-text-hide {
             display: none !important;
         }
-        html.sidebar-collapsed .sidebar-mini-show {
-            display: flex !important;
-        }
         html:not(.sidebar-collapsed) .sidebar-mini-show {
             display: none !important;
         }
@@ -73,9 +80,6 @@
         html.sidebar-collapsed .sidebar-footer-box {
             justify-content: center !important;
         }
-        html.sidebar-collapsed .sidebar-toggle-icon {
-            transform: rotate(180deg) !important;
-        }
 
         /* Transitions ONLY run when interacting via toggle button, NEVER during page load */
         .sidebar-animated aside#app-sidebar,
@@ -83,8 +87,7 @@
         .sidebar-animated .sidebar-header-box,
         .sidebar-animated .sidebar-nav-link,
         .sidebar-animated .sidebar-nav-inner,
-        .sidebar-animated .sidebar-footer-box,
-        .sidebar-animated .sidebar-toggle-icon {
+        .sidebar-animated .sidebar-footer-box {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
         }
     </style>
@@ -92,8 +95,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'Minnagram') }}</title>
-    <!-- Ikonkalar uchun FontAwesome qo'shildi -->
-     <!-- Space Grotesk ulanishi -->
+    <!-- Space Grotesk font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -111,6 +113,15 @@
             return document.documentElement.classList.contains('sidebar-collapsed');
         }
     })(),
+    isDark: (function() {
+        try {
+            var theme = localStorage.getItem('theme');
+            if (theme !== null) return theme === 'dark';
+            return document.documentElement.classList.contains('dark');
+        } catch(e) {
+            return document.documentElement.classList.contains('dark');
+        }
+    })(),
     toggleSidebar() {
         document.documentElement.classList.add('sidebar-animated');
         this.collapsed = !this.collapsed;
@@ -123,8 +134,21 @@
         } else {
             document.documentElement.classList.remove('sidebar-collapsed');
         }
+    },
+    toggleDarkMode() {
+        this.isDark = !this.isDark;
+        try {
+            localStorage.setItem('theme', this.isDark ? 'dark' : 'light');
+        } catch(e) {}
+        if (this.isDark) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
     }
-}" class="font-sans antialiased bg-[#f8f9fa] overflow-x-hidden"> <!-- Fon biroz ochartirildi, kontrast yaxshilanishi uchun -->
+}" 
+@toggle-dark-mode.window="toggleDarkMode()"
+class="font-sans antialiased bg-[#f8f9fa] dark:bg-slate-950 text-slate-900 dark:text-slate-100 overflow-x-hidden transition-colors duration-200">
     
     <x-sidebar />
     <x-mobile-tabbar />

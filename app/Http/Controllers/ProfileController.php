@@ -64,13 +64,17 @@ class ProfileController extends Controller
     public function update(Request $request) {
         $user = Auth::user();
         $data = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'nullable|string|max:255',
             'username' => 'nullable|string|max:255|unique:users,username,' . $user->id,
             'email' => 'nullable|string|lowercase|email|max:255|unique:users,email,' . $user->id,
             'bio' => 'nullable|string|max:1000',
-            'avatar' => 'nullable|image|max:2048',
-            'banner' => 'nullable|image|max:3072',
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:15360',
+            'banner' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:20480',
         ]);
+
+        if (empty($data['name'])) {
+            $data['name'] = $user->name;
+        }
 
         if (empty($data['username'])) {
             $data['username'] = $user->username;

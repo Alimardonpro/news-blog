@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div class="w-full h-[100dvh] lg:h-screen lg:p-6 bg-white lg:bg-slate-50/50 box-border flex flex-col"
+    <div class="w-full h-[100dvh] lg:h-screen lg:p-6 bg-white lg:bg-slate-50/50 dark:bg-slate-950 dark:lg:bg-slate-950 box-border flex flex-col transition-colors"
          x-data="chatApp({{ Auth::id() }}, @js($users))"
          x-init="init()">
 
@@ -36,16 +36,16 @@
             </div>
         </div>
 
-        <div class="flex flex-row w-full h-full min-h-0 bg-white lg:rounded-[2rem] lg:shadow-[0_8px_30px_rgb(0,0,0,0.04)] lg:border border-slate-200/60 overflow-hidden relative">
+        <div class="flex flex-row w-full h-full min-h-0 bg-white dark:bg-slate-900 lg:rounded-[2rem] lg:shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:lg:shadow-none lg:border border-slate-200/60 dark:border-slate-800 overflow-hidden relative">
 
             <!-- SIDEBAR -->
             <div id="sidebar"
                  :class="showChat ? 'hidden lg:flex' : 'flex'"
-                 class="w-full lg:w-[380px] lg:min-w-[280px] lg:max-w-[50vw] shrink-0 flex-col bg-white h-full relative z-10 transition-all duration-300">
+                 class="w-full lg:w-[380px] lg:min-w-[280px] lg:max-w-[50vw] shrink-0 flex-col bg-white dark:bg-slate-900 border-r border-slate-100 dark:border-slate-800 h-full relative z-10 transition-all duration-300">
 
-                <div class="p-4 lg:p-6 space-y-4 lg:space-y-6 shrink-0 border-b border-slate-50">
+                <div class="p-4 lg:p-6 space-y-4 lg:space-y-6 shrink-0 border-b border-slate-50 dark:border-slate-800">
                     <div class="flex items-center justify-between">
-                        <h1 class="text-xl lg:text-2xl font-black text-slate-900 tracking-tight">Xabarlar</h1>
+                        <h1 class="text-xl lg:text-2xl font-black text-slate-900 dark:text-white tracking-tight">Xabarlar</h1>
                     </div>
 
                     <div class="relative group">
@@ -53,7 +53,7 @@
                                x-model="searchQuery"
                                @input.debounce.300ms="searchGlobal"
                                placeholder="Foydalanuvchilarni izlash..."
-                               class="w-full bg-slate-100/70 border-none text-slate-900 text-sm rounded-2xl pl-10 lg:pl-12 pr-4 py-3 lg:py-3.5 focus:bg-white focus:ring-2 focus:ring-indigo-500/20 transition-all outline-none">
+                               class="w-full bg-slate-100/70 dark:bg-slate-800 border-none text-slate-900 dark:text-white text-sm rounded-2xl pl-10 lg:pl-12 pr-4 py-3 lg:py-3.5 focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-indigo-500/20 transition-all outline-none">
                         <div class="absolute left-3.5 lg:left-4 top-3 lg:top-3.5 text-slate-400 group-focus-within:text-indigo-500 transition-colors">
                             <svg class="w-4 h-4 lg:w-5 lg:h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                 <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -62,34 +62,34 @@
                     </div>
                 </div>
 
-                <div class="flex-1 overflow-y-auto p-2 pb-24 lg:p-3 lg:pb-3 space-y-1 custom-scrollbar bg-white lg:bg-slate-50/30">
+                <div class="flex-1 overflow-y-auto p-2 pb-24 lg:p-3 lg:pb-3 space-y-1 custom-scrollbar bg-white dark:bg-slate-900 lg:bg-slate-50/30 lg:dark:bg-slate-900/50">
                     <template x-for="u in filteredLocalUsers()" :key="'local-'+u.id">
                         <div @click="selectUser(u.id, u.name, u.avatar || null, u.unread_count || 0, u.username || '')"
-                             :class="selectedUserId === u.id ? 'bg-slate-900 shadow-lg shadow-slate-900/10' : 'hover:bg-slate-50 border border-transparent hover:border-slate-200'"
+                             :class="Number(selectedUserId) === Number(u.id) ? 'bg-indigo-600 dark:bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'hover:bg-slate-100/80 dark:hover:bg-slate-800 border border-transparent hover:border-slate-200 dark:hover:border-slate-700'"
                              class="flex gap-3 lg:gap-4 p-3 lg:p-3.5 cursor-pointer rounded-[1.2rem] lg:rounded-[1.5rem] transition-all duration-300 group">
 
                             <div class="relative flex-shrink-0">
                                 <template x-if="u.avatar">
                                     <img :src="storageUrl(u.avatar)"
                                          class="w-12 h-12 rounded-[1rem] object-cover ring-2"
-                                         :class="selectedUserId === u.id ? 'ring-slate-800' : 'ring-transparent'">
+                                         :class="Number(selectedUserId) === Number(u.id) ? 'ring-indigo-400' : 'ring-transparent'">
                                 </template>
 
                                 <template x-if="!u.avatar">
                                     <div class="w-12 h-12 rounded-[1rem] flex items-center justify-center font-black text-lg"
-                                         :class="selectedUserId === u.id ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-500'"
+                                         :class="Number(selectedUserId) === Number(u.id) ? 'bg-white/20 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100'"
                                          x-text="(u.name || '?').charAt(0)">
                                     </div>
                                 </template>
 
                                 <template x-if="onlineUsers.includes(u.id)">
                                     <div class="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-emerald-500 border-4 rounded-full"
-                                         :class="selectedUserId === u.id ? 'border-slate-900' : 'border-white'"></div>
+                                         :class="Number(selectedUserId) === Number(u.id) ? 'border-indigo-600' : 'border-white dark:border-slate-900'"></div>
                                 </template>
 
                                 <template x-if="unreadCounts[u.id] > 0">
                                     <div class="absolute -top-1.5 -right-1.5 min-w-[22px] h-[22px] px-1 bg-red-500 text-white text-[10px] font-black rounded-full flex items-center justify-center border-2"
-                                         :class="selectedUserId === u.id ? 'border-slate-900' : 'border-white'"
+                                         :class="Number(selectedUserId) === Number(u.id) ? 'border-indigo-600' : 'border-white dark:border-slate-900'"
                                          x-text="unreadCounts[u.id]">
                                     </div>
                                 </template>
@@ -98,12 +98,12 @@
                             <div class="flex-1 min-w-0 flex flex-col justify-center">
                                 <div class="flex justify-between items-baseline mb-0.5">
                                     <h3 class="font-bold truncate text-sm"
-                                        :class="selectedUserId === u.id ? 'text-white' : 'text-slate-900'"
+                                        :class="Number(selectedUserId) === Number(u.id) ? 'text-white' : 'text-slate-900 dark:text-white'"
                                         x-text="u.name">
                                     </h3>
                                 </div>
                                 <p class="text-xs truncate"
-                                   :class="selectedUserId === u.id ? 'text-slate-400' : 'text-slate-500'">
+                                   :class="Number(selectedUserId) === Number(u.id) ? 'text-indigo-100' : 'text-slate-500 dark:text-slate-300'">
                                     <template x-if="u.username">
                                         <span x-text="'@' + u.username"></span>
                                     </template>
@@ -116,38 +116,38 @@
                     </template>
 
                     <div x-show="filteredLocalUsers().length === 0 && globalUsers.length === 0"
-                         class="p-6 text-center text-slate-500 text-sm flex flex-col items-center"
+                         class="p-6 text-center text-slate-500 dark:text-slate-400 text-sm flex flex-col items-center"
                          x-cloak>
-                        <svg class="w-10 h-10 text-slate-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-10 h-10 text-slate-300 dark:text-slate-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"></path>
                         </svg>
                         Hech kim topilmadi.
                     </div>
 
                     <div x-show="globalUsers.length > 0 && searchQuery.trim() !== ''"
-                         class="mt-4 pt-4 border-t border-slate-200/60"
+                         class="mt-4 pt-4 border-t border-slate-200/60 dark:border-slate-800"
                          x-cloak>
-                        <p class="text-[10px] font-black text-indigo-500 mb-3 px-3 uppercase tracking-widest">Global qidiruv</p>
+                        <p class="text-[10px] font-black text-indigo-500 dark:text-indigo-400 mb-3 px-3 uppercase tracking-widest">Global qidiruv</p>
 
                         <template x-for="gu in globalUsers" :key="'global-'+gu.id">
                             <div @click="selectUser(gu.id, gu.name, gu.avatar || null, 0, gu.username || '')"
-                                 class="flex gap-3 lg:gap-4 p-3 lg:p-3.5 cursor-pointer hover:bg-indigo-50 border border-transparent hover:border-indigo-100 rounded-[1.2rem] lg:rounded-[1.5rem] transition-all duration-300 group mb-1">
+                                 class="flex gap-3 lg:gap-4 p-3 lg:p-3.5 cursor-pointer hover:bg-indigo-50 dark:hover:bg-indigo-950/40 border border-transparent hover:border-indigo-100 dark:hover:border-indigo-900/50 rounded-[1.2rem] lg:rounded-[1.5rem] transition-all duration-300 group mb-1">
 
                                 <div class="relative flex-shrink-0">
                                     <template x-if="gu.avatar">
                                         <img :src="storageUrl(gu.avatar)" class="w-12 h-12 rounded-[1rem] object-cover shadow-sm">
                                     </template>
                                     <template x-if="!gu.avatar">
-                                        <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-[1rem] flex items-center justify-center font-black text-lg shadow-sm"
+                                        <div class="w-12 h-12 bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 rounded-[1rem] flex items-center justify-center font-black text-lg shadow-sm"
                                              x-text="(gu.name || '?').charAt(0)"></div>
                                     </template>
                                 </div>
 
                                 <div class="flex-1 min-w-0 flex flex-col justify-center">
                                     <div class="flex justify-between items-baseline mb-0.5">
-                                        <h3 class="font-bold truncate text-sm text-slate-900 group-hover:text-indigo-900" x-text="gu.name"></h3>
+                                        <h3 class="font-bold truncate text-sm text-slate-900 dark:text-white group-hover:text-indigo-900 dark:group-hover:text-indigo-300" x-text="gu.name"></h3>
                                     </div>
-                                    <p class="text-xs truncate text-indigo-500 font-medium" x-text="'@' + (gu.username || '')"></p>
+                                    <p class="text-xs truncate text-indigo-500 dark:text-indigo-400 font-medium" x-text="'@' + (gu.username || '')"></p>
                                 </div>
                             </div>
                         </template>
@@ -156,7 +156,7 @@
             </div>
 
             <!-- RESIZER -->
-            <div id="resizer" class="hidden lg:flex w-1.5 bg-slate-100 hover:bg-indigo-400 active:bg-indigo-600 cursor-col-resize transition-colors duration-200 z-20 items-center justify-center group">
+            <div id="resizer" class="hidden lg:flex w-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-indigo-400 active:bg-indigo-600 cursor-col-resize transition-colors duration-200 z-20 items-center justify-center group">
                 <div class="flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <div class="w-0.5 h-0.5 bg-white rounded-full"></div>
                     <div class="w-0.5 h-0.5 bg-white rounded-full"></div>
@@ -166,23 +166,23 @@
 
             <!-- CHAT AREA -->
             <div :class="showChat ? 'flex' : 'hidden lg:flex'"
-                 class="flex-1 flex-col bg-white lg:bg-[#f8fafc] h-full relative z-10 w-full lg:min-w-[300px]">
+                 class="flex-1 flex-col bg-white lg:bg-[#f8fafc] dark:bg-slate-950 lg:dark:bg-slate-950 h-full relative z-10 w-full lg:min-w-[300px]">
 
-                <div x-show="!selectedUserId" class="flex-1 flex flex-col items-center justify-center bg-slate-50 lg:bg-transparent p-6 text-center">
-                    <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center mb-6 text-indigo-500 shadow-xl shadow-slate-200/50">
+                <div x-show="!selectedUserId" class="flex-1 flex flex-col items-center justify-center bg-slate-50 lg:bg-transparent dark:bg-slate-950 lg:dark:bg-transparent p-6 text-center">
+                    <div class="w-24 h-24 bg-white dark:bg-slate-900 rounded-full flex items-center justify-center mb-6 text-indigo-500 shadow-xl shadow-slate-200/50 dark:shadow-none border border-transparent dark:border-slate-800">
                         <svg class="w-12 h-12" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M19 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
                         </svg>
                     </div>
-                    <h3 class="text-xl font-black text-slate-800 mb-2 tracking-tight">Xabarlaringiz shu yerda</h3>
-                    <p class="text-sm text-slate-500 max-w-sm">Chap paneldan foydalanuvchini tanlang yoki qidiruv orqali yangi suhbat boshlang.</p>
+                    <h3 class="text-xl font-black text-slate-800 dark:text-white mb-2 tracking-tight">Xabarlaringiz shu yerda</h3>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 max-w-sm">Chap paneldan foydalanuvchini tanlang yoki qidiruv orqali yangi suhbat boshlang.</p>
                 </div>
 
                 <div x-show="selectedUserId" class="flex-1 flex flex-col h-full w-full" x-cloak>
                     <!-- Header -->
-                    <div class="bg-white/90 backdrop-blur-md border-b border-slate-100 p-3 lg:p-4 px-4 lg:px-6 flex justify-between items-center sticky top-0 z-20 shrink-0 shadow-sm lg:shadow-none">
+                    <div class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 p-3 lg:p-4 px-4 lg:px-6 flex justify-between items-center sticky top-0 z-20 shrink-0 shadow-sm lg:shadow-none">
                         <div class="flex items-center gap-3 lg:gap-4">
-                            <button @click="closeChat()" class="lg:hidden p-2 -ml-2 text-slate-500 hover:bg-slate-100 rounded-full transition-colors">
+                            <button @click="closeChat()" class="lg:hidden p-2 -ml-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
                                 </svg>
@@ -200,12 +200,12 @@
                                     </template>
 
                                     <template x-if="onlineUsers.includes(selectedUserId)">
-                                        <div class="absolute -top-1 -right-1 w-3 h-3 lg:w-3.5 lg:h-3.5 bg-emerald-500 border-2 border-white rounded-full"></div>
+                                        <div class="absolute -top-1 -right-1 w-3 h-3 lg:w-3.5 lg:h-3.5 bg-emerald-500 border-2 border-white dark:border-slate-900 rounded-full"></div>
                                     </template>
                                 </div>
 
                                 <div>
-                                    <h2 class="font-black text-slate-900 leading-none text-base lg:text-lg" x-text="selectedUserName"></h2>
+                                    <h2 class="font-black text-slate-900 dark:text-white leading-none text-base lg:text-lg" x-text="selectedUserName"></h2>
 
                                     <span x-show="onlineUsers.includes(selectedUserId)"
                                           class="text-[10px] font-bold text-emerald-500 uppercase tracking-widest mt-1 block"
@@ -213,7 +213,7 @@
                                         Hozir onlayn
                                     </span>
                                     <span x-show="!onlineUsers.includes(selectedUserId)"
-                                          class="text-[10px] font-bold text-slate-400 tracking-wider mt-1 block lowercase"
+                                          class="text-[10px] font-bold text-slate-400 dark:text-slate-400 tracking-wider mt-1 block lowercase"
                                           x-text="getLastSeenText(selectedUserId)"
                                           x-cloak>
                                     </span>
@@ -225,7 +225,7 @@
                             <button @click="showMessageSearch = !showMessageSearch; if(showMessageSearch) setTimeout(() => $refs.msgSearch.focus(), 80)"
                                     title="Xabarlardan izlash"
                                     class="w-10 h-10 flex items-center justify-center rounded-xl transition-all"
-                                    :class="showMessageSearch ? 'bg-indigo-50 text-indigo-600' : 'text-slate-400 hover:bg-slate-100 hover:text-indigo-600'">
+                                    :class="showMessageSearch ? 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400' : 'text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-indigo-600 dark:hover:text-indigo-400'">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                 </svg>
@@ -233,7 +233,7 @@
 
                             <button @click="showOptionsMenu = !showOptionsMenu"
                                     @click.away="showOptionsMenu = false"
-                                    class="w-10 h-10 flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-slate-900 rounded-xl transition-all">
+                                    class="w-10 h-10 flex items-center justify-center text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white rounded-xl transition-all">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
                                 </svg>
@@ -242,9 +242,9 @@
                             <div x-show="showOptionsMenu"
                                  x-transition.opacity.duration.150ms
                                  x-cloak
-                                 class="absolute top-12 right-0 w-52 bg-white rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.1)] border border-slate-100 overflow-hidden z-50">
+                                 class="absolute top-12 right-0 w-52 bg-white dark:bg-slate-900 rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.1)] dark:shadow-none border border-slate-100 dark:border-slate-800 overflow-hidden z-50">
                                 <button @click="clearChat(false); showOptionsMenu = false"
-                                        class="w-full text-left px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50 hover:text-slate-900 flex items-center gap-3 transition-colors">
+                                        class="w-full text-left px-4 py-3 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white flex items-center gap-3 transition-colors">
                                     <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 002 2h6a2 2 0 002-2l1-12M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3"></path>
                                     </svg>
@@ -252,7 +252,7 @@
                                 </button>
 
                                 <button @click="clearChat(true); showOptionsMenu = false"
-                                        class="w-full text-left px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 flex items-center gap-3 transition-colors border-t border-slate-50">
+                                        class="w-full text-left px-4 py-3 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 flex items-center gap-3 transition-colors border-t border-slate-50 dark:border-slate-800">
                                     <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                                     </svg>
@@ -266,13 +266,13 @@
                     <div x-show="showMessageSearch"
                          x-transition
                          x-cloak
-                         class="bg-slate-50 border-b border-slate-200/60 p-2 lg:p-3 px-4 lg:px-6 z-10 relative">
+                         class="bg-slate-50 dark:bg-slate-900 border-b border-slate-200/60 dark:border-slate-800 p-2 lg:p-3 px-4 lg:px-6 z-10 relative">
                         <div class="relative">
                             <input type="text"
                                    x-model="messageSearchQuery"
                                    x-ref="msgSearch"
                                    placeholder="Ushbu chatdan xabarni izlash..."
-                                   class="w-full bg-white border border-slate-200 text-sm text-slate-900 rounded-xl pl-10 pr-10 py-2 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 outline-none transition-all shadow-sm">
+                                   class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white rounded-xl pl-10 pr-10 py-2 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 outline-none transition-all shadow-sm">
                             <div class="absolute left-3 top-2.5 text-slate-400">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -280,7 +280,7 @@
                             </div>
                             <button x-show="messageSearchQuery.length > 0"
                                     @click="messageSearchQuery = ''; $refs.msgSearch.focus()"
-                                    class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600">
+                                    class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
                                 </svg>
@@ -289,7 +289,7 @@
                     </div>
 
                     <!-- Messages -->
-                    <div id="chat-messages" class="flex-1 overflow-y-auto p-4 lg:p-6 space-y-4 lg:space-y-5 bg-slate-50 lg:bg-transparent custom-scrollbar relative">
+                    <div id="chat-messages" class="flex-1 overflow-y-auto p-4 lg:p-6 space-y-4 lg:space-y-5 bg-slate-50 lg:bg-transparent dark:bg-slate-950 lg:dark:bg-transparent custom-scrollbar relative">
                         <div x-show="isLoading" class="flex justify-center my-4" x-cloak>
                             <svg class="animate-spin h-6 w-6 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -298,17 +298,17 @@
                         </div>
 
                         <div x-show="!isLoading && filteredMessages().length === 0" class="flex flex-col items-center justify-center h-full text-slate-400" x-cloak>
-                            <span class="text-sm font-medium bg-white px-4 py-2 rounded-full shadow-sm">Xabarlar yo‘q. Birinchi bo‘lib yozing 👋</span>
+                            <span class="text-sm font-medium bg-white dark:bg-slate-900 border border-transparent dark:border-slate-800 text-slate-500 dark:text-slate-300 px-4 py-2 rounded-full shadow-sm">Xabarlar yo‘q. Birinchi bo‘lib yozing 👋</span>
                         </div>
 
                         <template x-for="msg in filteredMessages()" :key="msg.id">
                             <div class="flex gap-2 lg:gap-3 max-w-[95%] lg:max-w-[85%] group/msg"
-                                 :class="msg.sender_id === myId ? 'ml-auto flex-row-reverse' : ''">
+                                 :class="Number(msg.sender_id) === Number(myId) ? 'ml-auto flex-row-reverse' : ''">
 
                                 <div class="relative flex flex-col gap-2">
                                     <!-- Image -->
                                     <template x-if="msg.image">
-                                        <div class="overflow-hidden rounded-[1.3rem] border border-slate-200 bg-white shadow-sm max-w-[320px]">
+                                        <div class="overflow-hidden rounded-[1.3rem] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm max-w-[320px]">
                                             <img :src="storageUrl(msg.image)"
                                                  @click="openModal(storageUrl(msg.image), 'image')"
                                                  class="w-full max-h-[320px] object-cover cursor-pointer hover:scale-[1.02] transition-transform">
@@ -317,7 +317,7 @@
 
                                     <!-- Video -->
                                     <template x-if="msg.video">
-                                        <div class="overflow-hidden rounded-[1.3rem] border border-slate-200 bg-white shadow-sm max-w-[360px]"
+                                        <div class="overflow-hidden rounded-[1.3rem] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm max-w-[360px]"
                                              x-data="{ fileSize: '...' }"
                                              x-init="
                                                 fetch(storageUrl(msg.video), { method: 'HEAD' })
@@ -333,9 +333,9 @@
                                                 <source :src="storageUrl(msg.video)">
                                             </video>
 
-                                            <div class="p-2.5 lg:p-3 border-t border-slate-100 bg-white flex justify-between items-center">
+                                            <div class="p-2.5 lg:p-3 border-t border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 flex justify-between items-center">
                                                 <button @click="$refs.inlineVideo.pause(); openModal(storageUrl(msg.video), 'video')"
-                                                        class="text-xs font-bold text-indigo-600 hover:text-indigo-700 flex items-center gap-1.5 transition-colors">
+                                                        class="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 flex items-center gap-1.5 transition-colors">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
                                                     </svg>
@@ -366,13 +366,13 @@
                                                     })
                                                     .catch(() => fileSize = '');
                                              "
-                                             :class="msg.sender_id === myId
+                                             :class="Number(msg.sender_id) === Number(myId)
                                                 ? 'bg-gradient-to-br from-indigo-500 to-blue-600 rounded-[1.2rem] lg:rounded-[1.5rem] rounded-br-none shadow-md shadow-indigo-500/20 text-white border-transparent'
-                                                : 'bg-white border border-slate-200 text-slate-700 rounded-[1.2rem] lg:rounded-[1.5rem] rounded-bl-none'">
+                                                : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white rounded-[1.2rem] lg:rounded-[1.5rem] rounded-bl-none'">
 
                                             <button @click="if(playing) { $refs.audioPlayer.pause(); playing = false; } else { $refs.audioPlayer.play(); playing = true; }"
                                                     class="w-10 h-10 lg:w-12 lg:h-12 rounded-full flex items-center justify-center shrink-0 shadow-sm transition-transform active:scale-95"
-                                                    :class="msg.sender_id === myId ? 'bg-white text-indigo-600' : 'bg-indigo-50 text-indigo-600 hover:bg-indigo-100'">
+                                                    :class="Number(msg.sender_id) === Number(myId) ? 'bg-white text-indigo-600' : 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/60'">
                                                 <svg x-show="!playing" class="w-5 h-5 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
                                                     <path d="M8 5v14l11-7z"/>
                                                 </svg>
@@ -395,7 +395,7 @@
                                                         <span x-text="playing ? duration : totalDuration"></span>
 
                                                         <template x-if="fileSize">
-                                                            <div class="flex items-center gap-2">
+                                                             <div class="flex items-center gap-2">
                                                                 <span class="w-1 h-1 bg-current rounded-full opacity-50"></span>
                                                                 <span x-text="fileSize" class="opacity-75"></span>
                                                             </div>
@@ -433,20 +433,20 @@
                                     <!-- Text -->
                                     <template x-if="msg.message">
                                         <div class="p-3 lg:p-4 shadow-sm leading-relaxed text-[14.5px] lg:text-[15px] relative"
-                                             :class="msg.sender_id === myId
+                                             :class="Number(msg.sender_id) === Number(myId)
                                                 ? 'bg-gradient-to-br from-indigo-500 to-blue-600 rounded-[1.2rem] lg:rounded-[1.5rem] rounded-br-none shadow-md shadow-indigo-500/20 text-white'
-                                                : 'bg-white border border-slate-200 rounded-[1.2rem] lg:rounded-[1.5rem] rounded-bl-none text-slate-700'">
+                                                : 'bg-white dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700/80 rounded-[1.2rem] lg:rounded-[1.5rem] rounded-bl-none text-slate-900 dark:text-white'">
 
                                             <p x-text="msg.message" class="break-words whitespace-pre-wrap"></p>
 
                                             <div class="flex items-center gap-1 mt-1.5"
-                                                 :class="msg.sender_id === myId ? 'justify-end' : ''">
+                                                 :class="Number(msg.sender_id) === Number(myId) ? 'justify-end' : ''">
                                                 <span class="text-[9px] lg:text-[10px] font-bold"
-                                                      :class="msg.sender_id === myId ? 'text-indigo-100' : 'text-slate-400'"
+                                                      :class="Number(msg.sender_id) === Number(myId) ? 'text-indigo-100' : 'text-slate-400 dark:text-slate-400'"
                                                       x-text="formatTime(msg.created_at)">
                                                 </span>
 
-                                                <template x-if="msg.sender_id === myId">
+                                                <template x-if="Number(msg.sender_id) === Number(myId)">
                                                     <div class="flex items-center">
                                                         <!-- 1 chek -->
                                                         <template x-if="!msg.is_read">
@@ -471,10 +471,10 @@
                                     <!-- Time for media-only messages -->
                                     <template x-if="!msg.message && (msg.image || msg.video || msg.audio)">
                                         <div class="px-1 flex items-center gap-1"
-                                             :class="msg.sender_id === myId ? 'justify-end' : ''">
-                                            <span class="text-[10px] font-bold text-slate-400" x-text="formatTime(msg.created_at)"></span>
+                                             :class="Number(msg.sender_id) === Number(myId) ? 'justify-end' : ''">
+                                            <span class="text-[10px] font-bold text-slate-400 dark:text-slate-400" x-text="formatTime(msg.created_at)"></span>
 
-                                            <template x-if="msg.sender_id === myId">
+                                            <template x-if="Number(msg.sender_id) === Number(myId)">
                                                 <div class="flex items-center">
                                                     <template x-if="!msg.is_read">
                                                         <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -495,12 +495,12 @@
 
                                     <!-- Actions -->
                                     <div class="absolute top-1/2 -translate-y-1/2 opacity-0 group-hover/msg:opacity-100 flex items-center gap-1 transition-opacity"
-                                         :class="msg.sender_id === myId ? 'right-full mr-2' : 'left-full ml-2'">
+                                         :class="Number(msg.sender_id) === Number(myId) ? 'right-full mr-2' : 'left-full ml-2'">
 
-                                        <template x-if="msg.sender_id === myId && msg.message">
+                                        <template x-if="Number(msg.sender_id) === Number(myId) && msg.message">
                                             <button @click="startEdit(msg)"
                                                     title="Tahrirlash"
-                                                    class="p-1.5 bg-white hover:bg-indigo-50 text-slate-400 hover:text-indigo-600 rounded-full transition shadow-sm border border-slate-100">
+                                                    class="p-1.5 bg-white dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-slate-700 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-full transition shadow-sm border border-slate-100 dark:border-slate-700">
                                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
                                                 </svg>
@@ -509,7 +509,7 @@
 
                                         <button @click="deleteMsg(msg.id)"
                                                 title="O‘chirish"
-                                                class="p-1.5 bg-white hover:bg-red-50 text-slate-400 hover:text-red-600 rounded-full transition shadow-sm border border-slate-100">
+                                                class="p-1.5 bg-white dark:bg-slate-800 hover:bg-red-50 dark:hover:bg-red-950/50 text-slate-400 hover:text-red-600 dark:hover:text-red-400 rounded-full transition shadow-sm border border-slate-100 dark:border-slate-700">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                                             </svg>
@@ -521,15 +521,15 @@
                     </div>
 
                     <!-- Footer -->
-                    <div class="bg-white border-t border-slate-100 shrink-0 pb-safe">
-                        <div x-show="editingMsgId" x-transition x-cloak class="px-4 lg:px-6 py-3 bg-indigo-50 border-b border-indigo-100 flex items-center justify-between">
-                            <div class="flex items-center gap-2 text-indigo-600 text-xs font-bold uppercase tracking-wider">
+                    <div class="bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 shrink-0 pb-safe">
+                        <div x-show="editingMsgId" x-transition x-cloak class="px-4 lg:px-6 py-3 bg-indigo-50 dark:bg-indigo-950/40 border-b border-indigo-100 dark:border-indigo-900/50 flex items-center justify-between">
+                            <div class="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 text-xs font-bold uppercase tracking-wider">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
                                 </svg>
                                 <span>Xabar tahrirlanmoqda</span>
                             </div>
-                            <button @click="cancelEdit()" class="text-slate-400 hover:text-red-500 transition">
+                            <button @click="cancelEdit()" class="text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
                                 </svg>
@@ -537,10 +537,10 @@
                         </div>
 
                         <div x-show="selectedFile && !isRecording" x-transition x-cloak class="px-4 lg:px-6 pt-3">
-                            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3 flex items-center justify-between gap-3">
+                            <div class="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-3 flex items-center justify-between gap-3">
                                 <div class="flex items-center gap-3 min-w-0">
                                     <template x-if="mediaType === 'image' && previewUrl">
-                                        <img :src="previewUrl" class="w-14 h-14 rounded-xl object-cover border border-slate-200">
+                                        <img :src="previewUrl" class="w-14 h-14 rounded-xl object-cover border border-slate-200 dark:border-slate-700">
                                     </template>
 
                                     <template x-if="mediaType === 'video'">
@@ -552,7 +552,7 @@
                                     </template>
 
                                     <template x-if="mediaType === 'audio'">
-                                        <div class="w-14 h-14 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center">
+                                        <div class="w-14 h-14 rounded-xl bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
                                             <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-2v13"></path>
                                                 <circle cx="6" cy="18" r="3"></circle>
@@ -562,12 +562,12 @@
                                     </template>
 
                                     <div class="min-w-0">
-                                        <p class="text-sm font-bold text-slate-800 truncate" x-text="selectedFileName"></p>
-                                        <p class="text-xs text-slate-500" x-text="mediaTypeLabel()"></p>
+                                        <p class="text-sm font-bold text-slate-800 dark:text-slate-100 truncate" x-text="selectedFileName"></p>
+                                        <p class="text-xs text-slate-500 dark:text-slate-400" x-text="mediaTypeLabel()"></p>
                                     </div>
                                 </div>
 
-                                <button type="button" @click="clearSelectedFile()" class="w-9 h-9 rounded-full hover:bg-red-50 text-slate-400 hover:text-red-500 flex items-center justify-center transition">
+                                <button type="button" @click="clearSelectedFile()" class="w-9 h-9 rounded-full hover:bg-red-50 dark:hover:bg-red-950/40 text-slate-400 hover:text-red-500 dark:hover:text-red-400 flex items-center justify-center transition">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
                                     </svg>
@@ -576,15 +576,15 @@
                         </div>
 
                         <div x-show="isRecording" x-transition x-cloak class="px-4 lg:px-6 pt-3">
-                            <div class="bg-red-50 border border-red-100 rounded-2xl p-3 flex items-center justify-between gap-3">
-                                <div class="flex items-center gap-3 text-red-600">
+                            <div class="bg-red-50 dark:bg-red-950/40 border border-red-100 dark:border-red-900/50 rounded-2xl p-3 flex items-center justify-between gap-3">
+                                <div class="flex items-center gap-3 text-red-600 dark:text-red-400">
                                     <span class="w-3 h-3 rounded-full bg-red-500 animate-pulse"></span>
                                     <span class="text-sm font-bold uppercase tracking-wider">Ovoz yozilmoqda...</span>
                                     <span class="text-sm font-black" x-text="recordingTimeText"></span>
                                 </div>
 
                                 <div class="flex items-center gap-2">
-                                    <button type="button" @click="cancelRecording()" class="px-3 py-2 text-xs font-bold rounded-xl bg-white border border-red-100 text-red-500 hover:bg-red-50 transition">
+                                    <button type="button" @click="cancelRecording()" class="px-3 py-2 text-xs font-bold rounded-xl bg-white dark:bg-slate-800 border border-red-100 dark:border-red-900/50 text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/60 transition">
                                         Bekor qilish
                                     </button>
                                     <button type="button" @click="stopRecording()" class="px-3 py-2 text-xs font-bold rounded-xl bg-red-500 text-white hover:bg-red-600 transition">
@@ -596,7 +596,7 @@
 
                         <div class="p-3 mb-2 lg:p-4">
                             <form @submit.prevent="sendMessage"
-                                  class="flex items-center gap-2 lg:gap-3 bg-slate-50 border border-slate-200 p-1 lg:p-1.5 rounded-[1.2rem] lg:rounded-2xl focus-within:bg-white focus-within:ring-2 focus-within:ring-indigo-100 transition-all duration-300 shadow-sm">
+                                  class="flex items-center gap-2 lg:gap-3 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 p-1 lg:p-1.5 rounded-[1.2rem] lg:rounded-2xl focus-within:bg-white dark:focus-within:bg-slate-800 focus-within:ring-2 focus-within:ring-indigo-100 dark:focus-within:ring-indigo-900/40 transition-all duration-300 shadow-sm">
 
                                 <input type="file"
                                        x-ref="mediaInput"
@@ -606,7 +606,7 @@
 
                                 <button type="button"
                                         @click="$refs.mediaInput.click()"
-                                        class="w-10 h-10 lg:w-11 lg:h-11 shrink-0 flex items-center justify-center rounded-xl text-slate-500 hover:bg-white hover:text-indigo-600 transition">
+                                        class="w-10 h-10 lg:w-11 lg:h-11 shrink-0 flex items-center justify-center rounded-xl text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700 hover:text-indigo-600 dark:hover:text-indigo-400 transition">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
                                     </svg>
@@ -617,13 +617,13 @@
                                        x-model="newMessage"
                                        :disabled="isRecording"
                                        :placeholder="editingMsgId ? 'Xabarni tahrirlash...' : 'Xabar yozing...'"
-                                       class="flex-1 bg-transparent border-none focus:ring-0 text-[14px] lg:text-[15px] text-slate-900 py-2 outline-none pl-1 disabled:opacity-50">
+                                       class="flex-1 bg-transparent border-none focus:ring-0 text-[14px] lg:text-[15px] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 py-2 outline-none pl-1 disabled:opacity-50">
 
                                 <template x-if="editingMsgId">
                                     <button type="button"
                                             @click="cancelEdit()"
                                             title="Bekor qilish"
-                                            class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors">
+                                            class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-lg transition-colors">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
                                         </svg>
@@ -633,7 +633,7 @@
                                 <template x-if="!editingMsgId && !newMessage.trim() && !selectedFile && !isRecording">
                                     <button type="button"
                                             @click="startRecording()"
-                                            class="w-10 h-10 lg:w-11 lg:h-11 shrink-0 flex items-center justify-center rounded-xl text-slate-500 hover:bg-white hover:text-indigo-600 transition">
+                                            class="w-10 h-10 lg:w-11 lg:h-11 shrink-0 flex items-center justify-center rounded-xl text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700 hover:text-indigo-600 dark:hover:text-indigo-400 transition">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 18v3m-4 0h8M9 5a3 3 0 116 0v7a3 3 0 11-6 0V5z"></path>
                                         </svg>
@@ -672,9 +672,12 @@
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #475569; }
         .no-select { user-select: none; }
         .pb-safe { padding-bottom: env(safe-area-inset-bottom, 1rem); }
         audio::-webkit-media-controls-panel { background-color: rgba(255,255,255,.85); }
+        .dark audio::-webkit-media-controls-panel { background-color: rgba(30,41,59,.9); filter: invert(0.85) hue-rotate(180deg); }
     </style>
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>

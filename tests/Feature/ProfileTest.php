@@ -83,3 +83,37 @@ test('correct password must be provided to delete account', function () {
 
     $this->assertNotNull($user->fresh());
 });
+
+test('user can directly upload avatar', function () {
+    \Illuminate\Support\Facades\Storage::fake('public');
+    $user = User::factory()->create();
+
+    $response = $this
+        ->actingAs($user)
+        ->patch('/profile', [
+            'name' => $user->name,
+            'avatar' => \Illuminate\Http\UploadedFile::fake()->image('avatar.jpg'),
+        ]);
+
+    $response->assertSessionHasNoErrors()->assertRedirect('/profile');
+    $user->refresh();
+    $this->assertNotNull($user->avatar);
+    \Illuminate\Support\Facades\Storage::disk('public')->assertExists($user->avatar);
+});
+
+test('user can directly upload banner', function () {
+    \Illuminate\Support\Facades\Storage::fake('public');
+    $user = User::factory()->create();
+
+    $response = $this
+        ->actingAs($user)
+        ->patch('/profile', [
+            'name' => $user->name,
+            'banner' => \Illuminate\Http\UploadedFile::fake()->image('banner.jpg'),
+        ]);
+
+    $response->assertSessionHasNoErrors()->assertRedirect('/profile');
+    $user->refresh();
+    $this->assertNotNull($user->banner);
+    \Illuminate\Support\Facades\Storage::disk('public')->assertExists($user->banner);
+});

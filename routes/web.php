@@ -70,10 +70,27 @@ Route::middleware('auth')->group(function () {
     // BILDIRISHNOMALAR
     Route::get('/notifications', function () {
         $user = Auth::user();
-        $notifications = $user->notifications;
-        $user->unreadNotifications->markAsRead();
-        return view('notifications', compact('notifications'));
+        // Foydalanuvchiga ko'rsatish uchun uning bildirishnomalarini olamiz
+        $notifications = $user->notifications()->get();
+        // Bir marta ko'rgach o'chsin: foydalanuvchi ko'rishi bilan bazadan tozalanadi
+        $user->notifications()->delete();
+
+        $suggestedUsers = \App\Models\User::where('id', '!=', $user->id)
+            ->latest()
+            ->take(8)
+            ->get();
+        return view('notifications', compact('notifications', 'suggestedUsers'));
     })->name('notifications');
+
+    Route::delete('/notifications/{id}', function ($id) {
+        Auth::user()->notifications()->where('id', $id)->delete();
+        return response()->json(['success' => true]);
+    })->name('notifications.destroy');
+
+    Route::delete('/notifications', function () {
+        Auth::user()->notifications()->delete();
+        return back();
+    })->name('notifications.clear');
 
     // PROFIL VA OBUNACHILAR RO'YXATI (Bular oxirida bo'lishi shart)
     Route::get('/@{username}', [ProfileController::class, 'show'])->name('profile.show');

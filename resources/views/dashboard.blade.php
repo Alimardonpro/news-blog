@@ -27,20 +27,33 @@
             window.history.replaceState({}, document.title, cleanUrl);
         }
     "
-    class="h-[100dvh] lg:h-screen flex flex-col bg-[#F8FAFC] font-sans overflow-hidden overscroll-none"> 
+    class="h-[100dvh] lg:h-screen flex flex-col bg-[#F8FAFC] dark:bg-slate-950 font-sans overflow-hidden overscroll-none"> 
 
-        <header class="sticky top-0 inset-x-0 flex h-[60px] sm:h-[70px] shrink-0 items-center justify-between px-4 sm:px-6 lg:px-10 border-b border-gray-200 bg-white/95 backdrop-blur-md z-40 shadow-sm select-none">
-            <h2 class="text-lg sm:text-xl font-black text-gray-900 tracking-tight">Postlar Lentasi</h2>
+        <header class="sticky top-0 inset-x-0 flex h-[60px] sm:h-[70px] shrink-0 items-center justify-between px-4 sm:px-6 lg:px-10 border-b border-gray-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md z-40 shadow-sm select-none relative">
+            <!-- Desktop Title: Postlar Lentasi -->
+            <h2 class="hidden lg:block text-lg sm:text-xl font-black text-gray-900 dark:text-white tracking-tight">Postlar Lentasi</h2>
             
-            <div class="flex items-center gap-2 sm:gap-3">
-                <button @click="openNotifications = true" class="relative p-2 sm:p-2.5 text-gray-700 hover:bg-gray-100 rounded-full transition group" title="Bildirishnomalar">
+            <!-- Mobile App Title & Icon: Minnagram markazda -->
+            <div class="lg:hidden absolute left-1/2 -translate-x-1/2 flex items-center gap-2">
+                <div class="bg-black dark:bg-white text-white dark:text-black p-1.5 rounded-xl shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+                </div>
+                <span class="text-lg font-black text-gray-900 dark:text-white tracking-tight">Minnagram</span>
+            </div>
+
+            <!-- Right side: Notifications & Desktop-only Yangi Post button -->
+            <div class="flex items-center gap-2 sm:gap-3 ml-auto">
+                <button @click="openNotifications = true" class="relative p-2 sm:p-2.5 text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition group" title="Bildirishnomalar">
                     <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
                     </svg>
-                    <span class="absolute top-1.5 sm:top-2 right-2 sm:right-2.5 w-2 sm:w-2.5 h-2 sm:h-2.5 bg-red-500 border-2 border-white rounded-full"></span>
+                    @if(Auth::check() && Auth::user()->unreadNotifications()->count() > 0)
+                        <span class="absolute top-1.5 sm:top-2 right-2 sm:right-2.5 w-2 sm:w-2.5 h-2 sm:h-2.5 bg-red-500 border-2 border-white dark:border-slate-900 rounded-full"></span>
+                    @endif
                 </button>
 
-                <button @click.stop="openPostModal = true" class="bg-black hover:bg-gray-800 text-white text-xs sm:text-sm font-bold px-3.5 sm:px-6 py-2 sm:py-2.5 rounded-full transition shadow-lg flex items-center gap-1.5 sm:gap-2 hover:-translate-y-0.5">
+                <!-- Yangi Post tugmasi: faqat katta ekranda (desktop) ko'rinadi, mobilda yashirilgan -->
+                <button @click.stop="openPostModal = true" class="hidden lg:flex bg-black dark:bg-white hover:bg-gray-800 dark:hover:bg-slate-200 text-white dark:text-black text-xs sm:text-sm font-bold px-3.5 sm:px-6 py-2 sm:py-2.5 rounded-full transition shadow-lg items-center gap-1.5 sm:gap-2 hover:-translate-y-0.5">
                     <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                     <span>Yangi Post</span>
                 </button>
@@ -51,12 +64,12 @@
             
             @if($posts->isEmpty())
                 <div class="flex items-center justify-center h-full">
-                    <div class="text-center bg-white p-12 rounded-[3rem] shadow-sm max-w-md w-full mx-4 border border-gray-100">
-                        <div class="w-20 h-20 bg-gray-50 flex items-center justify-center rounded-full mx-auto mb-4">
-                            <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    <div class="text-center bg-white dark:bg-slate-900 p-12 rounded-[3rem] shadow-sm max-w-md w-full mx-4 border border-gray-100 dark:border-slate-800">
+                        <div class="w-20 h-20 bg-gray-50 dark:bg-slate-800 flex items-center justify-center rounded-full mx-auto mb-4">
+                            <svg class="w-10 h-10 text-gray-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                         </div>
-                        <h3 class="text-xl font-bold text-gray-900">Hali postlar yo'q</h3>
-                        <p class="text-gray-500 mt-2">Birinchi bo'lib post joylang!</p>
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white">Hali postlar yo'q</h3>
+                        <p class="text-gray-500 dark:text-slate-400 mt-2">Birinchi bo'lib post joylang!</p>
                     </div>
                 </div>
             @endif
@@ -479,35 +492,46 @@
 
         <template x-teleport="body">
             <div x-show="openNotifications" style="display: none;" class="fixed inset-0 z-[160] flex justify-end">
-                <div @click="openNotifications = false" class="absolute inset-0 bg-black/20 backdrop-blur-sm" x-transition.opacity></div>
-                <div class="relative h-full w-full sm:w-[380px] bg-white shadow-[-10px_0_30px_rgba(0,0,0,0.1)] flex flex-col transform transition-transform duration-300 ease-out"
+                <div @click="openNotifications = false" class="absolute inset-0 bg-black/40 backdrop-blur-sm" x-transition.opacity></div>
+                <div class="relative h-full w-full sm:w-[380px] bg-white dark:bg-slate-900 border-l border-gray-100 dark:border-slate-800 shadow-[-10px_0_30px_rgba(0,0,0,0.1)] dark:shadow-[-10px_0_30px_rgba(0,0,0,0.5)] flex flex-col transform transition-transform duration-300 ease-out"
                      x-show="openNotifications"
                      x-transition:enter-start="translate-x-full" x-transition:enter-end="translate-x-0"
                      x-transition:leave-start="translate-x-0" x-transition:leave-end="translate-x-full">
                     
-                    <div class="flex items-center justify-between px-6 py-5 border-b border-gray-100 bg-white shrink-0">
-                        <h2 class="text-xl font-black text-gray-900">Bildirishnomalar</h2>
-                        <button @click="openNotifications = false" class="p-2 hover:bg-gray-100 rounded-full transition"><svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                    <div class="flex items-center justify-between px-6 py-5 border-b border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900 shrink-0">
+                        <h2 class="text-xl font-black text-gray-900 dark:text-white">Bildirishnomalar</h2>
+                        <button @click="openNotifications = false" class="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition text-gray-600 dark:text-slate-300">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
                     </div>
 
-                    <div class="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
-                        <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100 flex gap-3 hover:bg-gray-100 transition cursor-pointer">
-                            <div class="w-10 h-10 bg-black rounded-full flex items-center justify-center text-white font-bold shrink-0">M</div>
-                            <div>
-                                <p class="text-sm text-gray-800"><span class="font-bold">Minnagram</span> sizni xush ko'rdik!</p>
-                                <span class="text-[11px] text-gray-400">Hozirgina</span>
+                    <div class="flex-1 overflow-y-auto p-3 space-y-2 custom-scrollbar bg-white dark:bg-slate-900">
+                        @php
+                            $drawerNotifications = Auth::check() ? Auth::user()->notifications()->take(10)->get() : collect();
+                        @endphp
+
+                        @forelse($drawerNotifications as $dNotif)
+                            <a href="/notifications" class="p-2.5 bg-gray-50 dark:bg-slate-800/80 rounded-xl border border-gray-100 dark:border-slate-700/60 flex items-start gap-2.5 hover:bg-gray-100 dark:hover:bg-slate-700/80 transition cursor-pointer block">
+                                <img src="{{ isset($dNotif->data['avatar']) ? asset('storage/'.$dNotif->data['avatar']) : 'https://ui-avatars.com/api/?name='.urlencode($dNotif->data['name'] ?? 'U').'&background=0088cc&color=fff' }}" class="w-8 h-8 rounded-full object-cover shrink-0 mt-0.5">
+                                <div class="min-w-0 flex-1">
+                                    <p class="text-xs text-gray-800 dark:text-slate-200 line-clamp-2 leading-snug">
+                                        <span class="font-bold text-gray-900 dark:text-white">{{ $dNotif->data['name'] ?? 'Foydalanuvchi' }}</span>
+                                        {{ $dNotif->data['message'] ?? '' }}
+                                    </p>
+                                    <span class="text-[10px] text-gray-400 dark:text-slate-500 font-medium">{{ $dNotif->created_at->diffForHumans() }}</span>
+                                </div>
+                            </a>
+                        @empty
+                            <div class="h-40 flex flex-col items-center justify-center text-gray-400 dark:text-slate-500 opacity-60">
+                                <svg class="w-10 h-10 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                                <p class="text-xs font-medium">Yangi bildirishnomalar yo'q</p>
                             </div>
-                        </div>
-
-                        <div class="h-40 flex flex-col items-center justify-center text-gray-400 opacity-60">
-                            <svg class="w-12 h-12 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
-                            <p class="text-sm font-medium">Yangi bildirishnomalar yo'q</p>
-                        </div>
+                        @endforelse
                     </div>
 
-                    <div class="p-4 border-t border-gray-100">
-                        <a href="/notifications" class="w-full flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-900 font-bold py-3 rounded-2xl transition">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M19 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                    <div class="p-4 border-t border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900">
+                        <a href="/notifications" class="w-full flex items-center justify-center gap-2 bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-900 dark:text-white font-bold py-3 rounded-2xl transition">
+                            <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M19 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
                             Barcha xabarlarni ko'rish
                         </a>
                     </div>
@@ -532,21 +556,22 @@
                  style="display: none;" 
                  class="fixed inset-0 z-[120] flex items-center justify-center p-4 overflow-y-auto">
                 <div @click="openPostModal = false" class="fixed inset-0 bg-black/60 backdrop-blur-sm" x-transition.opacity></div>
-                <div class="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl relative z-10 my-auto border border-gray-100 overflow-hidden" x-transition>
+                <div class="bg-white dark:bg-slate-900 w-full max-w-lg rounded-[2.5rem] shadow-2xl relative z-10 my-auto border border-gray-100 dark:border-slate-800 overflow-hidden" x-transition>
                     <form id="createPostForm" action="{{ route('posts.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <input type="hidden" name="theme" :value="selectedTheme">
 
-                        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-50 bg-white">
-                            <button type="button" @click="openPostModal = false" class="text-gray-400 hover:bg-gray-100 p-2 rounded-full transition"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
-                            <h2 class="text-lg font-bold text-gray-900">Yangi post</h2>
-                            <button type="submit" class="text-white text-sm font-bold px-6 py-2 rounded-full transition shadow-md bg-black hover:bg-gray-800">Ulashish</button>
+                        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-50 dark:border-slate-800 bg-white dark:bg-slate-900">
+                            <button type="button" @click="openPostModal = false" class="text-gray-400 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 p-2 rounded-full transition"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                            <h2 class="text-lg font-bold text-gray-900 dark:text-white">Yangi post</h2>
+                            <button type="submit" class="text-white dark:text-black text-sm font-bold px-6 py-2 rounded-full transition shadow-md bg-black dark:bg-white hover:bg-gray-800 dark:hover:bg-slate-200">Ulashish</button>
                         </div>
                         
                         <div class="p-6">
                             <!-- Text Area with Dynamic Live Theme Background -->
                             <div class="rounded-2xl p-4 transition-all duration-300 relative overflow-hidden"
-                                 :style="imagePreviews.length === 0 ? 'background: ' + (themes.find(t => t.key === selectedTheme)?.bg || '#111') : 'background: #f8fafc'">
+                                 :class="imagePreviews.length === 0 ? '' : 'bg-slate-50 dark:bg-slate-800/80 border border-slate-100 dark:border-slate-700/60'"
+                                 :style="imagePreviews.length === 0 ? 'background: ' + (themes.find(t => t.key === selectedTheme)?.bg || '#111') : ''">
                                 
                                 <div x-show="imagePreviews.length === 0" class="absolute -top-3 -right-3 text-white/5 pointer-events-none select-none">
                                     <svg class="w-20 h-20 rotate-12" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
@@ -554,12 +579,12 @@
                                 
                                 <div class="flex gap-3 relative z-10">
                                     <div class="shrink-0">
-                                        <img src="{{ Auth::user()->avatar ? asset('storage/'.Auth::user()->avatar) : 'https://ui-avatars.com/api/?name='.Auth::user()->name }}" class="h-9 w-9 rounded-full object-cover border" :class="imagePreviews.length === 0 ? 'border-white/30' : 'border-gray-200'">
+                                        <img src="{{ Auth::user()->avatar ? asset('storage/'.Auth::user()->avatar) : 'https://ui-avatars.com/api/?name='.Auth::user()->name }}" class="h-9 w-9 rounded-full object-cover border" :class="imagePreviews.length === 0 ? 'border-white/30' : 'border-gray-200 dark:border-slate-700'">
                                     </div>
                                     <div class="flex-1">
                                         <textarea name="body" rows="4" 
                                                   class="w-full border-none focus:ring-0 text-[16px] resize-none p-0 bg-transparent outline-none transition-colors"
-                                                  :class="imagePreviews.length === 0 ? 'text-white placeholder-white/60 font-semibold' : 'text-gray-900 placeholder-gray-400'"
+                                                  :class="imagePreviews.length === 0 ? 'text-white placeholder-white/60 font-semibold' : 'text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500'"
                                                   placeholder="Fikringizni yozing..." required></textarea>
                                     </div>
                                 </div>
@@ -568,7 +593,7 @@
                                 <div x-show="imagePreviews.length > 0" style="display:none;" class="relative mt-3 flex gap-2 overflow-x-auto pb-2 custom-scrollbar">
                                     <template x-for="(preview, index) in imagePreviews" :key="index">
                                         <div class="relative shrink-0 w-24 h-24">
-                                            <img :src="preview" class="w-full h-full rounded-xl object-cover shadow-sm border border-gray-100">
+                                            <img :src="preview" class="w-full h-full rounded-xl object-cover shadow-sm border border-gray-100 dark:border-slate-700">
                                         </div>
                                     </template>
                                     <button @click="imagePreviews = []; document.getElementById('imageInput').value = ''" type="button" class="absolute top-1 right-1 bg-black/70 text-white rounded-full p-1.5 transition hover:bg-black shadow-md z-10"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
@@ -577,13 +602,13 @@
 
                             <!-- Theme Selector (Shown when no images) -->
                             <div x-show="imagePreviews.length === 0" class="mt-4 flex items-center justify-between">
-                                <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Mavzuni tanlang:</span>
+                                <span class="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Mavzuni tanlang:</span>
                                 <div class="flex items-center gap-2">
                                     <template x-for="t in themes" :key="t.key">
                                         <button type="button" 
                                                 @click="selectedTheme = t.key"
                                                 class="w-7 h-7 rounded-full transition-transform duration-200 border-2"
-                                                :class="selectedTheme === t.key ? 'scale-125 border-gray-900 shadow-md ring-2 ring-indigo-400' : 'border-transparent opacity-80 hover:opacity-100 hover:scale-110'"
+                                                :class="selectedTheme === t.key ? 'scale-125 border-gray-900 dark:border-white shadow-md ring-2 ring-indigo-400' : 'border-transparent opacity-80 hover:opacity-100 hover:scale-110'"
                                                 :style="`background: ${t.bg};`"
                                                 :title="t.name">
                                         </button>
@@ -592,9 +617,9 @@
                             </div>
 
                             <!-- Add Images Action -->
-                            <div class="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
-                                <label class="cursor-pointer text-gray-700 hover:bg-gray-100 px-4 py-2 rounded-xl transition inline-flex items-center gap-2">
-                                    <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            <div class="mt-4 pt-4 border-t border-gray-100 dark:border-slate-800 flex items-center justify-between">
+                                <label class="cursor-pointer text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 px-4 py-2 rounded-xl transition inline-flex items-center gap-2">
+                                    <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                                     <span class="text-sm font-bold" x-text="imagePreviews.length > 0 ? imagePreviews.length + ' ta rasm tanlandi' : 'Rasm qo\'shish (ixtiyoriy)'"></span>
                                     <input type="file" id="imageInput" name="images[]" multiple="multiple" class="hidden" accept="image/*" 
                                            @change="
@@ -620,22 +645,23 @@
                  style="display: none;" 
                  class="fixed inset-0 z-[120] flex items-center justify-center p-4 overflow-y-auto">
                 <div @click="openEditModal = false" class="fixed inset-0 bg-black/60 backdrop-blur-sm" x-transition.opacity></div>
-                <div class="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl relative z-10 my-auto border border-gray-100 animate-zoom-in overflow-hidden" x-transition>
+                <div class="bg-white dark:bg-slate-900 w-full max-w-lg rounded-[2.5rem] shadow-2xl relative z-10 my-auto border border-gray-100 dark:border-slate-800 animate-zoom-in overflow-hidden" x-transition>
                     <form id="editPostForm" :action="`/posts/${editingPost.id}`" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PATCH')
                         <input type="hidden" name="theme" :value="editSelectedTheme">
 
-                        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-50 bg-white">
-                            <button type="button" @click="openEditModal = false" class="text-gray-400 hover:bg-gray-100 p-2 rounded-full transition"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
-                            <h2 class="text-lg font-bold text-gray-900">Postni tahrirlash</h2>
-                            <button type="submit" class="bg-black hover:bg-gray-800 text-white text-sm font-bold px-6 py-2 rounded-full transition shadow-md">Saqlash</button>
+                        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-50 dark:border-slate-800 bg-white dark:bg-slate-900">
+                            <button type="button" @click="openEditModal = false" class="text-gray-400 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 p-2 rounded-full transition"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                            <h2 class="text-lg font-bold text-gray-900 dark:text-white">Postni tahrirlash</h2>
+                            <button type="submit" class="bg-black dark:bg-white hover:bg-gray-800 dark:hover:bg-slate-200 text-white dark:text-black text-sm font-bold px-6 py-2 rounded-full transition shadow-md">Saqlash</button>
                         </div>
                         
                         <div class="p-6">
                             <!-- Text Area with Dynamic Live Theme Background -->
                             <div class="rounded-2xl p-4 transition-all duration-300 relative overflow-hidden"
-                                 :style="editImagePreviews.length === 0 ? 'background: ' + (themes.find(t => t.key === editSelectedTheme)?.bg || '#111') : 'background: #f8fafc'">
+                                 :class="editImagePreviews.length === 0 ? '' : 'bg-slate-50 dark:bg-slate-800/80 border border-slate-100 dark:border-slate-700/60'"
+                                 :style="editImagePreviews.length === 0 ? 'background: ' + (themes.find(t => t.key === editSelectedTheme)?.bg || '#111') : ''">
                                 
                                 <div x-show="editImagePreviews.length === 0" class="absolute -top-3 -right-3 text-white/5 pointer-events-none select-none">
                                     <svg class="w-20 h-20 rotate-12" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
@@ -643,12 +669,12 @@
 
                                 <div class="flex gap-3 relative z-10">
                                     <div class="shrink-0">
-                                        <img src="{{ Auth::user()->avatar ? asset('storage/'.Auth::user()->avatar) : 'https://ui-avatars.com/api/?name='.Auth::user()->name }}" class="h-9 w-9 rounded-full object-cover border" :class="editImagePreviews.length === 0 ? 'border-white/30' : 'border-gray-200'">
+                                        <img src="{{ Auth::user()->avatar ? asset('storage/'.Auth::user()->avatar) : 'https://ui-avatars.com/api/?name='.Auth::user()->name }}" class="h-9 w-9 rounded-full object-cover border" :class="editImagePreviews.length === 0 ? 'border-white/30' : 'border-gray-200 dark:border-slate-700'">
                                     </div>
                                     <div class="flex-1">
                                         <textarea name="body" x-model="editingPost.body" rows="4" 
                                                   class="w-full border-none focus:ring-0 text-[16px] resize-none p-0 bg-transparent outline-none transition-colors"
-                                                  :class="editImagePreviews.length === 0 ? 'text-white placeholder-white/60 font-semibold' : 'text-gray-900 placeholder-gray-400'"
+                                                  :class="editImagePreviews.length === 0 ? 'text-white placeholder-white/60 font-semibold' : 'text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500'"
                                                   placeholder="Matn yozing..." required></textarea>
                                     </div>
                                 </div>
@@ -657,7 +683,7 @@
                                 <div x-show="editImagePreviews.length > 0" style="display:none;" class="relative mt-3 flex gap-2 overflow-x-auto pb-2 custom-scrollbar">
                                     <template x-for="(preview, index) in editImagePreviews" :key="index">
                                         <div class="relative shrink-0 w-24 h-24">
-                                            <img :src="preview" class="w-full h-full rounded-xl object-cover shadow-sm border border-gray-100">
+                                            <img :src="preview" class="w-full h-full rounded-xl object-cover shadow-sm border border-gray-100 dark:border-slate-700">
                                         </div>
                                     </template>
                                     <button @click="editImagePreviews = []; document.getElementById('editImageInput').value = ''" type="button" class="absolute top-1 right-1 bg-black/70 text-white rounded-full p-1.5 transition hover:bg-black shadow-md z-10"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
@@ -666,13 +692,13 @@
 
                             <!-- Theme Selector (Shown when no images) -->
                             <div x-show="editImagePreviews.length === 0" class="mt-4 flex items-center justify-between">
-                                <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Mavzuni tanlang:</span>
+                                <span class="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Mavzuni tanlang:</span>
                                 <div class="flex items-center gap-2">
                                     <template x-for="t in themes" :key="t.key">
                                         <button type="button" 
                                                 @click="editSelectedTheme = t.key"
                                                 class="w-7 h-7 rounded-full transition-transform duration-200 border-2"
-                                                :class="editSelectedTheme === t.key ? 'scale-125 border-gray-900 shadow-md ring-2 ring-indigo-400' : 'border-transparent opacity-80 hover:opacity-100 hover:scale-110'"
+                                                :class="editSelectedTheme === t.key ? 'scale-125 border-gray-900 dark:border-white shadow-md ring-2 ring-indigo-400' : 'border-transparent opacity-80 hover:opacity-100 hover:scale-110'"
                                                 :style="`background: ${t.bg};`"
                                                 :title="t.name">
                                         </button>
@@ -681,9 +707,9 @@
                             </div>
 
                             <!-- Images Upload/Change Action -->
-                            <div class="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
-                                <label class="cursor-pointer text-gray-700 hover:bg-gray-100 px-4 py-2 rounded-xl transition inline-flex items-center gap-2">
-                                    <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            <div class="mt-4 pt-4 border-t border-gray-100 dark:border-slate-800 flex items-center justify-between">
+                                <label class="cursor-pointer text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 px-4 py-2 rounded-xl transition inline-flex items-center gap-2">
+                                    <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                                     <span class="text-sm font-bold" x-text="editImagePreviews.length > 0 ? editImagePreviews.length + ' ta rasm tanlangan' : 'Rasmlarni yangilash (ixtiyoriy)'"></span>
                                     <input type="file" id="editImageInput" name="images[]" multiple="multiple" class="hidden" accept="image/*" 
                                            @change="
